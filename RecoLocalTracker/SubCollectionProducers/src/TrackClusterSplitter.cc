@@ -1536,8 +1536,9 @@ void TrackClusterSplitter::splitCluster<SiPixelCluster> (const SiPixelClusterWit
 			}
 		      
 		      // Make and fill the bool arrays flagging double pixels
-		      std::vector<bool> ydouble(cluster_matrix_size_y), xdouble(cluster_matrix_size_x);
-		      
+		      // std::vector<bool> ydouble(cluster_matrix_size_y), xdouble(cluster_matrix_size_x);
+		      bool ydouble[cluster_matrix_size_y], xdouble[cluster_matrix_size_x];
+
 		      // x directions (shorter), rows
 		      for (int irow = 0; irow < cluster_matrix_size_x; ++irow)
 			{
@@ -1634,18 +1635,28 @@ void TrackClusterSplitter::splitCluster<SiPixelCluster> (const SiPixelClusterWit
 				}
 			    }
 			   
-   
+			  // bool template_OK
+			  //   = templ2D_.xytemp(ID, cotalpha_, cotbeta_,
+			  // 		      xrecp1, yrecp1,
+			  // 		      ydouble, xdouble,
+			  // 		      template2d1);
+
 			  bool template_OK 
-			    = templ2D_.xytemp(ID, cotalpha_, cotbeta_, 
-					      xrecp1, yrecp1, 
+			    = templ2D_.xytemp(xrecp1, yrecp1, 
 					      ydouble, xdouble, 
 					      template2d1);
 			  
-			  template_OK 
-			    = template_OK && 
-			    templ2D_.xytemp(ID, cotalpha_, cotbeta_, 
-					    xrecp2, yrecp2, 
-					    ydouble, xdouble, 
+			  // template_OK 
+			  //   = template_OK && 
+			  //   templ2D_.xytemp(ID, cotalpha_, cotbeta_, 
+			  // 		    xrecp2, yrecp2, 
+			  // 		    ydouble, xdouble, 
+			  // 		    template2d2);
+
+			  template_OK
+                            = template_OK &&
+			    templ2D_.xytemp(xrecp2, yrecp2,
+					    ydouble, xdouble,
 					    template2d2);
 			  
 			  if ( !template_OK ) 

@@ -310,8 +310,9 @@ public:
    void qbin_dist(int id, float cotalpha, float cotbeta, float qbin_frac[4], float& ny1_frac, float& ny2_frac, float& nx1_frac, float& nx2_frac);
    
    //Method to calculate simple 2D templates
-   bool simpletemplate2D(float xhitp, float yhitp, std::vector<bool>& ydouble, std::vector<bool>& xdouble, float template2d[BXM2][BYM2]);
-   
+   // bool simpletemplate2D(float xhitp, float yhitp, std::vector<bool>& ydouble, std::vector<bool>& xdouble, float template2d[BXM2][BYM2]);
+   bool simpletemplate2D(float xhitp, float yhitp, bool ydouble[BYM2], bool xdouble[BXM2], float template2d[BXM2][BYM2]);
+
    //Method to interpolate Vavilov distribution parameters
    void vavilov_pars(double& mpv, double& sigma, double& kappa);
    

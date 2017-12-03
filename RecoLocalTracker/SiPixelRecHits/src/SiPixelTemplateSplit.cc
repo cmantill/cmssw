@@ -1,4 +1,4 @@
-#if 0
+//#if 0
 //
 //  SiPixelTemplateSplit.cc (Version 2.30)
 //
@@ -96,10 +96,11 @@ using namespace SiPixelTemplateSplit;
 //! \param    zeropix - (input) vector of index pairs pointing to the dead pixels
 // *************************************************************************************************************************************
 int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& clust, 
-		    std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-		    SiPixelTemplate& templ, 
-		    float& yrec1, float& yrec2, float& sigmay, float& prob2y,
-			float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, bool deadpix, std::vector<std::pair<int, int> >& zeropix, SiPixelTemplate2D& templ2D)
+ 					 // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+					 bool ydouble[BYM2], bool xdouble[BXM2],
+					 SiPixelTemplate& templ, 
+					 float& yrec1, float& yrec2, float& sigmay, float& prob2y,
+					 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, bool deadpix, std::vector<std::pair<int, int> >& zeropix, SiPixelTemplate2D& templ2D)
 			
 {
     // Local variables 
@@ -169,11 +170,13 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 	}
 	nclusx = (int)cluster.shape()[0];
 	nclusy = (int)cluster.shape()[1];
-	if(nclusx != (int)xdouble.size()) {
+	//if(nclusx != (int)xdouble.size()) {
+	if(nclusx != BXM2) {
 	   LOGERROR("SiPixelTemplateReco") << "input cluster container x-size is not equal to double pixel flag container size" << ENDL;	
 	   return 4;
 	}
-	if(nclusy != (int)ydouble.size()) {
+	//if(nclusy != (int)ydouble.size()) {
+	if(nclusy != BYM2) {
 	   LOGERROR("SiPixelTemplateReco") << "input cluster container y-size is not equal to double pixel flag container size" << ENDL;	
 	   return 5;
 	}
@@ -957,14 +960,19 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 		
 // Add the two hits in the first hypothesis
 		
-		any2dfail = templ2D.xytemp(id, cotalpha, cotbeta, x1p, y1p, xdouble, ydouble, temp2d1) && templ2D.xytemp(id, cotalpha, cotbeta, x2p, y2p, xdouble, ydouble, temp2d1);
+		// any2dfail = templ2D.xytemp(id, cotalpha, cotbeta, x1p, y1p, xdouble, ydouble, temp2d1) && templ2D.xytemp(id, cotalpha, cotbeta, x2p, y2p, xdouble, ydouble, temp2d1);
+		any2dfail = templ2D.xytemp(x1p, y1p, xdouble, ydouble, temp2d1) && templ2D.xytemp(x2p, y2p, xdouble, ydouble, temp2d1);
 		
 // And then the second hypothesis
 		
-		any2dfail = any2dfail && templ2D.xytemp(id, cotalpha, cotbeta, x1p, y2p, xdouble, ydouble, temp2d2);
+		// any2dfail = any2dfail && templ2D.xytemp(id, cotalpha, cotbeta, x1p, y2p, xdouble, ydouble, temp2d2);
 		
-		any2dfail = any2dfail && templ2D.xytemp(id, cotalpha, cotbeta, x2p, y1p, xdouble, ydouble, temp2d2);
-		
+		// any2dfail = any2dfail && templ2D.xytemp(id, cotalpha, cotbeta, x2p, y1p, xdouble, ydouble, temp2d2);
+
+		any2dfail = any2dfail && templ2D.xytemp(x1p, y2p, xdouble, ydouble, temp2d2);
+
+                any2dfail = any2dfail && templ2D.xytemp(x2p, y1p, xdouble, ydouble, temp2d2);		
+
 // If any of these have failed, use the simple templates instead
 		
 		if(!any2dfail) {
@@ -1088,10 +1096,11 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 // *************************************************************************************************************************************
 
 int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-		    std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-		    SiPixelTemplate& templ, 
-		    float& yrec1, float& yrec2, float& sigmay, float& prob2y,
-			float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, SiPixelTemplate2D& templ2D)
+					 // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+                                         bool ydouble[BYM2], bool xdouble[BXM2],
+					 SiPixelTemplate& templ, 
+					 float& yrec1, float& yrec2, float& sigmay, float& prob2y,
+					 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, SiPixelTemplate2D& templ2D)
 {
     // Local variables 
 	const bool deadpix = false;
@@ -1129,7 +1138,8 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 // *************************************************************************************************************************************
 
 int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-                                         std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+                                         // std::vector<bool>& ydouble, std::vector<bool>& xdouble,
+                                         bool ydouble[BYM2], bool xdouble[BXM2], 
                                          SiPixelTemplate& templ, 
                                          float& yrec1, float& yrec2, float& sigmay, float& prob2y,
                                          float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, float& dchisq, SiPixelTemplate2D& templ2D)
@@ -1140,7 +1150,7 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
     const int speed = 1;
     
 	return SiPixelTemplateSplit::PixelTempSplit(id, cotalpha, cotbeta, cluster, ydouble, xdouble, templ, 
-                                                yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
+						    yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
     
 } // PixelTempSplit
 
@@ -1168,10 +1178,11 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 // *************************************************************************************************************************************
 
 int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-										std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-										SiPixelTemplate& templ, 
-										float& yrec1, float& yrec2, float& sigmay, float& prob2y,
-										float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, SiPixelTemplate2D& templ2D)
+					 // std::vector<bool>& ydouble, std::vector<bool>& xdouble,
+                                         bool ydouble[BYM2], bool xdouble[BXM2],
+					 SiPixelTemplate& templ, 
+					 float& yrec1, float& yrec2, float& sigmay, float& prob2y,
+					 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, SiPixelTemplate2D& templ2D)
 {
     // Local variables 
 	const bool deadpix = false;
@@ -1181,7 +1192,7 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 	const int speed = 1;
     
 	return SiPixelTemplateSplit::PixelTempSplit(id, cotalpha, cotbeta, cluster, ydouble, xdouble, templ, 
-											   yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
+						    yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
 	
 } // PixelTempSplit
 
@@ -1210,10 +1221,11 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 // *************************************************************************************************************************************
 
 int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-													 std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-													 SiPixelTemplate& templ, 
-													 float& yrec1, float& yrec2, float& sigmay, float& prob2y,
-													 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, SiPixelTemplate2D& templ2D)
+					 // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+                                         bool ydouble[BYM2], bool xdouble[BXM2],
+					 SiPixelTemplate& templ, 
+					 float& yrec1, float& yrec2, float& sigmay, float& prob2y,
+					 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, SiPixelTemplate2D& templ2D)
 {
 	// Local variables 
 	const bool deadpix = false;
@@ -1223,10 +1235,10 @@ int SiPixelTemplateSplit::PixelTempSplit(int id, float cotalpha, float cotbeta, 
 	const int speed = 1;
 	
 	return SiPixelTemplateSplit::PixelTempSplit(id, cotalpha, cotbeta, cluster, ydouble, xdouble, templ, 
-															 yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
+						    yrec1, yrec2, sigmay, prob2y, xrec1, xrec2, sigmax, prob2x, q2bin, prob2Q, resolve, speed, dchisq, deadpix, zeropix, templ2D);
 	
 } // PixelTempSplit
 
 
 
-#endif
+//#endif

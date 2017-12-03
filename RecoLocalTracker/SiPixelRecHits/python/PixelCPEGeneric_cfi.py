@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 PixelCPEGenericESProducer = cms.ESProducer("PixelCPEGenericESProducer",
 
     ComponentName = cms.string('PixelCPEGeneric'),
+    #ComponentName = cms.string('PixelCPEClusterRepair'),
     Alpha2Order = cms.bool(True),
     PixelErrorParametrization = cms.string('NOTcmsim'),
 
@@ -64,8 +65,8 @@ PixelCPEGenericESProducer = cms.ESProducer("PixelCPEGenericESProducer",
 from Configuration.Eras.Modifier_phase2_tracker_cff import phase2_tracker
 phase2_tracker.toModify(PixelCPEGenericESProducer, 
   useLAWidthFromDB = False,
-  UseErrorsFromTemplates = False,
-  LoadTemplatesFromDB = False,
+  UseErrorsFromTemplates = True,
+  LoadTemplatesFromDB = True,
   TruncatePixelCharge = False,
   IrradiationBiasCorrection = False,
   DoCosmics = False,

@@ -54,35 +54,40 @@ namespace SiPixelTemplateSplit
 	 	 
 	 
 	int PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-				std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-				SiPixelTemplate& templ, 
-				float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
-							 float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, bool deadpix, 
-							 std::vector<std::pair<int, int> >& zeropix, SiPixelTemplate2D& templ2D);
+			   // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+			   bool ydouble[BYM2], bool xdouble[BXM2],
+			   SiPixelTemplate& templ, 
+			   float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
+			   float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, bool deadpix, 
+			   std::vector<std::pair<int, int> >& zeropix, SiPixelTemplate2D& templ2D);
 	 
 	 int PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-							  std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-							  SiPixelTemplate& templ, 
-							  float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
-							  float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, SiPixelTemplate2D& templ2D);
+			    // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+			    bool ydouble[BYM2], bool xdouble[BXM2],
+			    SiPixelTemplate& templ, 
+			    float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
+			    float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, int speed, float& dchisq, SiPixelTemplate2D& templ2D);
 	 
 	int PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-				std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-				SiPixelTemplate& templ, 
-				float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
-				float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, float& dchisq, SiPixelTemplate2D& templ2D);
-	 
+			   // std::vector<bool>& ydouble, std::vector<bool>& xdouble,  
+			   bool ydouble[BYM2], bool xdouble[BXM2],
+			   SiPixelTemplate& templ, 
+			   float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
+			   float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, bool resolve, float& dchisq, SiPixelTemplate2D& templ2D);
+	
 	 int PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-						std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-						SiPixelTemplate& templ, 
-						float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
-						float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, SiPixelTemplate2D& templ2D);
+			    // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+			    bool ydouble[BYM2], bool xdouble[BXM2],
+			    SiPixelTemplate& templ, 
+			    float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
+			    float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, float& prob2Q, SiPixelTemplate2D& templ2D);
 
 	 int PixelTempSplit(int id, float cotalpha, float cotbeta, array_2d& cluster, 
-							  std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
-							  SiPixelTemplate& templ, 
-							  float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
-							  float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, SiPixelTemplate2D& templ2D);
+			    // std::vector<bool>& ydouble, std::vector<bool>& xdouble, 
+			    bool ydouble[BYM2], bool xdouble[BXM2],
+			    SiPixelTemplate& templ, 
+			    float& yrec1, float& yrec2, float& sigmay, float& prob2y, 
+			    float& xrec1, float& xrec2, float& sigmax, float& prob2x, int& q2bin, SiPixelTemplate2D& templ2D);
 	 
 }
 				

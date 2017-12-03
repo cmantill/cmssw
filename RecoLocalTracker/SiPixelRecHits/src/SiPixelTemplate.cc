@@ -3121,7 +3121,7 @@ void SiPixelTemplate::qbin_dist(int id, float cotalpha, float cotbeta, float qbi
 //! \param template2d - (output) 2d template of size matched to the cluster.  Input must be zeroed since charge is added only.
 // *************************************************************************************************************************************
 
-bool SiPixelTemplate::simpletemplate2D(float xhit, float yhit, std::vector<bool>& ydouble, std::vector<bool>& xdouble, float template2d[BXM2][BYM2])
+bool SiPixelTemplate::simpletemplate2D(float xhit, float yhit, bool ydouble[BYM2], bool xdouble[BXM2], float template2d[BXM2][BYM2])
 {
    
    // Local variables
