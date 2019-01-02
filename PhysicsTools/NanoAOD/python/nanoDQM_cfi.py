@@ -42,6 +42,10 @@ nanoDQM = DQMEDAnalyzer("NanoAODDQM",
                 Plot1D('dxyErr', 'dxyErr', 20, 0, 0.2, 'dxy uncertainty, in cm'),
                 Plot1D('dz', 'dz', 20, -0.3, 0.3, 'dz (with sign) wrt first PV, in cm'),
                 Plot1D('dzErr', 'dzErr', 20, 0, 0.2, 'dz uncertainty, in cm'),
+<<<<<<< HEAD
+                Plot1D('eCorr', 'eCorr', 20, 0.8, 2, 'ratio of the calibrated energy/miniaod energy'),
+=======
+>>>>>>> official-cmssw/master
                 Plot1D('eInvMinusPInv', 'eInvMinusPInv', 20, -0.1, 0.1, '1/E_SC - 1/p_trk'),
                 Plot1D('energyErr', 'energyErr', 20, 0, 90, 'energy error of the cluster-track combination'),
                 Plot1D('eta', 'eta', 20, -3, 3, 'eta'),
@@ -95,16 +99,38 @@ nanoDQM = DQMEDAnalyzer("NanoAODDQM",
                 Plot1D('btagCSVV2', 'btagCSVV2', 20, -1, 1, ' pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)'),
                 Plot1D('btagDeepB', 'btagDeepB', 20, -1, 1, 'Deep B+BB btag discriminator'),
                 Plot1D('btagHbb', 'btagHbb', 20, -1, 1, 'Higgs to BB tagger discriminator'),
+<<<<<<< HEAD
+=======
+                Plot1D('deepTagMD_H4qvsQCD', 'deepTagMD_H4qvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger H->4q vs QCD discriminator'),
+                Plot1D('deepTagMD_HbbvsQCD', 'deepTagMD_HbbvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger H->bb vs QCD discriminator'),
+>>>>>>> official-cmssw/master
                 Plot1D('deepTagMD_TvsQCD', 'deepTagMD_TvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger top vs QCD discriminator'),
                 Plot1D('deepTagMD_WvsQCD', 'deepTagMD_WvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger W vs QCD discriminator'),
                 Plot1D('deepTagMD_ZHbbvsQCD', 'deepTagMD_ZHbbvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z/H->bb vs QCD discriminator'),
                 Plot1D('deepTagMD_ZHccvsQCD', 'deepTagMD_ZHccvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z/H->cc vs QCD discriminator'),
+<<<<<<< HEAD
+=======
+                Plot1D('deepTagMD_ZbbvsQCD', 'deepTagMD_ZbbvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z->bb vs QCD discriminator'),
+                Plot1D('deepTagMD_ZvsQCD', 'deepTagMD_ZvsQCD', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z vs QCD discriminator'),
+>>>>>>> official-cmssw/master
                 Plot1D('deepTagMD_bbvsLight', 'deepTagMD_bbvsLight', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z/H/gluon->bb vs light flavour discriminator'),
                 Plot1D('deepTagMD_ccvsLight', 'deepTagMD_ccvsLight', 20, 0, 1, 'Mass-decorrelated DeepBoostedJet tagger Z/H/gluon->cc vs light flavour discriminator'),
                 Plot1D('deepTag_TvsQCD', 'deepTag_TvsQCD', 20, 0, 1, 'DeepBoostedJet tagger top vs QCD discriminator'),
                 Plot1D('deepTag_WvsQCD', 'deepTag_WvsQCD', 20, 0, 1, 'DeepBoostedJet tagger W vs QCD discriminator'),
+<<<<<<< HEAD
+=======
+                Plot1D('deepTag_ZvsQCD', 'deepTag_ZvsQCD', 20, 0, 1, 'DeepBoostedJet tagger Z vs QCD discriminator'),
+>>>>>>> official-cmssw/master
                 Plot1D('eta', 'eta', 20, -4, 4, 'eta'),
                 Plot1D('jetId', 'jetId', 8, -0.5, 7.5, 'Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto'),
+                Plot1D('lep3eta', 'lep3eta', 20, -2, 2, 'Lep eta (3 subjets)'),
+                Plot1D('lep3id', 'lep3id', 14, -0.5, 13.5, 'Lep id (3 subjets)'),
+                Plot1D('lep3idmatch', 'lep3idmatch', 14, -0.5, 13.5, 'Lep id match to RECO (3 subjets)'),
+                Plot1D('lep3phi', 'lep3phi', 20, -3, 3, 'Lep phi (3 subjets)'),
+                Plot1D('lep3pt', 'lep3pt', 20, -200, 200, 'Lep pT (3 subjets)'),
+                Plot1D('lmd3', 'lmd3', 20, -1, 1, 'LMD (3 subjets)'),
+                Plot1D('lsf3', 'lsf3', 20, -1, 1, 'LSF (3 subjets)'),
+                Plot1D('lsf3match', 'lsf3match', 20, -1, 1, 'LSF match to RECO (3 subjets)'),
                 Plot1D('mass', 'mass', 20, 0, 300, 'mass'),
                 Plot1D('msoftdrop', 'msoftdrop', 20, -300, 300, 'Soft drop mass'),
                 Plot1D('n2b1', 'n2b1', 20, 0, 1, 'N2 (beta=1)'),
@@ -138,6 +164,7 @@ nanoDQM = DQMEDAnalyzer("NanoAODDQM",
                 Plot1D('METFilters', 'METFilters', 2, -0.5, 1.5, 'Trigger/flag bit'),
                 Plot1D('chargedHadronTrackResolutionFilter', 'chargedHadronTrackResolutionFilter', 2, -0.5, 1.5, 'Trigger/flag bit'),
                 Plot1D('ecalBadCalibFilter', 'ecalBadCalibFilter', 2, -0.5, 1.5, 'Trigger/flag bit'),
+                Plot1D('ecalBadCalibFilterV2', 'ecalBadCalibFilterV2', 1, 0.5, 1.5, 'Bad ECAL calib flag (updated xtal list)'),
                 Plot1D('ecalLaserCorrFilter', 'ecalLaserCorrFilter', 2, -0.5, 1.5, 'Trigger/flag bit'),
                 Plot1D('eeBadScFilter', 'eeBadScFilter', 2, -0.5, 1.5, 'Trigger/flag bit'),
                 Plot1D('globalSuperTightHalo2016Filter', 'globalSuperTightHalo2016Filter', 2, -0.5, 1.5, 'Trigger/flag bit'),
@@ -384,6 +411,11 @@ nanoDQM = DQMEDAnalyzer("NanoAODDQM",
                 Plot1D('charge', 'charge', 1, -0.5, 0.5, 'electric charge'),
                 Plot1D('cleanmask', 'cleanmask', 1, 0.5, 1.5, 'simple cleaning mask with priority to leptons'),
                 Plot1D('cutBasedBitmap', 'cutBasedBitmap', 8, -0.5, 7.5, 'cut-based ID bitmap, 2^(0:loose, 1:medium, 2:tight)'),
+<<<<<<< HEAD
+                Plot1D('eCorr', 'eCorr', 20, 1, 2, 'ratio of the calibrated energy/miniaod energy'),
+=======
+                Plot1D('cutBasedV1Bitmap', 'cutBasedV1Bitmap', 8, -0.5, 7.5, 'cut-based ID bitmap, Fall17 V1, 2^(0:loose, 1:medium, 2:tight)'),
+>>>>>>> official-cmssw/master
                 NoPlot('electronIdx'),
                 Plot1D('electronVeto', 'electronVeto', 2, -0.5, 1.5, 'pass electron veto'),
                 Plot1D('energyErr', 'energyErr', 20, 0, 300, 'energy error of the cluster from regression'),
@@ -396,6 +428,7 @@ nanoDQM = DQMEDAnalyzer("NanoAODDQM",
                 NoPlot('jetIdx'),
                 NoPlot('mass'),
                 Plot1D('mvaID', 'mvaID', 20, -1, 1, 'MVA ID score'),
+                Plot1D('mvaIDV1', 'mvaIDV1', 20, -1, 1, 'MVA ID score, Fall17 V1p1'),
                 Plot1D('mvaID_WP80', 'mvaID_WP80', 2, -0.5, 1.5, 'MVA ID WP80'),
                 Plot1D('mvaID_WP90', 'mvaID_WP90', 2, -0.5, 1.5, 'MVA ID WP90'),
                 Plot1D('pdgId', 'pdgId', 1, 21.5, 22.5, 'PDG code assigned by the event reconstruction (not by MC truth)'),
