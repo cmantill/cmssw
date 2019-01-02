@@ -22,10 +22,7 @@ from Configuration.Eras.Modifier_run2_nanoAOD_92X_cff import run2_nanoAOD_92X
 from Configuration.Eras.Modifier_run2_nanoAOD_94X2016_cff import run2_nanoAOD_94X2016
 from Configuration.Eras.Modifier_run2_nanoAOD_94XMiniAODv1_cff import run2_nanoAOD_94XMiniAODv1
 from Configuration.Eras.Modifier_run2_nanoAOD_94XMiniAODv2_cff import run2_nanoAOD_94XMiniAODv2
-<<<<<<< HEAD
-=======
 from Configuration.Eras.Modifier_run2_nanoAOD_102Xv1_cff import run2_nanoAOD_102Xv1
->>>>>>> official-cmssw/master
 
 nanoMetadata = cms.EDProducer("UniqueStringProducer",
     strings = cms.PSet(
@@ -149,10 +146,7 @@ for modifier in run2_nanoAOD_94XMiniAODv1, run2_nanoAOD_94XMiniAODv2, run2_nanoA
     modifier.toModify(extraFlagsTable, variables = dict(Flag_ecalBadCalibFilterV2 = ExtVar(cms.InputTag("ecalBadCalibFilterNanoTagger"), bool, doc = "Bad ECAL calib flag (updated xtal list)")))
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-<<<<<<< HEAD
 from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask
-=======
->>>>>>> official-cmssw/master
 def nanoAOD_addDeepInfo(process,addDeepBTag,addDeepFlavour):
     _btagDiscriminators=[]
     if addDeepBTag:
@@ -180,7 +174,6 @@ def nanoAOD_addDeepInfo(process,addDeepBTag,addDeepFlavour):
     if addDeepFlavour:
         process.pfDeepFlavourJetTagsWithDeepInfo.graph_path = 'RecoBTag/Combined/data/DeepFlavourV03_10X_training/constant_graph.pb'
         process.pfDeepFlavourJetTagsWithDeepInfo.lp_names = ["cpf_input_batchnorm/keras_learning_phase"]
-<<<<<<< HEAD
     patAlgosToolsTask = getPatAlgosToolsTask(process)
     patAlgosToolsTask.add(process.updatedPatJetsWithDeepInfo)
     patAlgosToolsTask.add(process.patJetCorrFactorsWithDeepInfo)
@@ -217,9 +210,6 @@ def nanoAOD_activateVID(process):
     process.photonSequence.insert(process.photonSequence.index(bitmapVIDForPho),process.egmPhotonIDSequence)
     return process
 
-=======
-    return process
-
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 #from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 def nanoAOD_recalibrateMETs(process,isData):
@@ -249,7 +239,6 @@ def nanoAOD_activateVID(process):
     process.photonSequence.insert(process.photonSequence.index(bitmapVIDForPho),process.egmPhotonIDSequence)
     return process
 
->>>>>>> official-cmssw/master
 def nanoAOD_addDeepInfoAK8(process,addDeepBTag,addDeepBoostedJet,jecPayload):
     _btagDiscriminators=[]
     if addDeepBTag:
@@ -272,21 +261,15 @@ def nanoAOD_addDeepInfoAK8(process,addDeepBTag,addDeepBoostedJet,jecPayload):
        postfix='AK8WithDeepInfo',
        printWarning = False
        )
-<<<<<<< HEAD
     process.lepInJetVars.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
-=======
->>>>>>> official-cmssw/master
     process.looseJetIdAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.tightJetIdAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.tightJetIdLepVetoAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.slimmedJetsAK8WithUserData.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
-<<<<<<< HEAD
     patAlgosToolsTask = getPatAlgosToolsTask(process)
     patAlgosToolsTask.add(process.updatedPatJetsAK8WithDeepInfo)
     patAlgosToolsTask.add(process.patJetCorrFactorsAK8WithDeepInfo)
     process.additionalendpath = cms.EndPath(patAlgosToolsTask)
-=======
->>>>>>> official-cmssw/master
     return process
 
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
@@ -329,27 +312,21 @@ def nanoAOD_customizeCommon(process):
 def nanoAOD_customizeData(process):
     process = nanoAOD_customizeCommon(process)
     process = nanoAOD_recalibrateMETs(process,isData=True)
-<<<<<<< HEAD
     if hasattr(process,'calibratedPatElectrons80X'):
         process.calibratedPatElectrons80X.isMC = cms.bool(False)
         process.calibratedPatPhotons80X.isMC = cms.bool(False)
-=======
     for modifier in run2_nanoAOD_94XMiniAODv1, run2_nanoAOD_94XMiniAODv2:
         modifier.toModify(process, nanoAOD_runMETfixEE2017(process,isData=True))
->>>>>>> official-cmssw/master
     return process
 
 def nanoAOD_customizeMC(process):
     process = nanoAOD_customizeCommon(process)
     process = nanoAOD_recalibrateMETs(process,isData=False)
-<<<<<<< HEAD
     if hasattr(process,'calibratedPatElectrons80X'):
         process.calibratedPatElectrons80X.isMC = cms.bool(True)
         process.calibratedPatPhotons80X.isMC = cms.bool(True)
-=======
     for modifier in run2_nanoAOD_94XMiniAODv1, run2_nanoAOD_94XMiniAODv2:
         modifier.toModify(process, nanoAOD_runMETfixEE2017(process,isData=False))
->>>>>>> official-cmssw/master
     return process
 
 ### Era dependent customization
@@ -360,10 +337,6 @@ _80x_sequence.remove(isoTrackSequence)
 #add stuff
 _80x_sequence.insert(_80x_sequence.index(jetSequence), extraFlagsProducers)
 _80x_sequence.insert(_80x_sequence.index(simpleCleanerTable)+1, extraFlagsTable)
-<<<<<<< HEAD
-
-run2_miniAOD_80XLegacy.toReplaceWith( nanoSequenceCommon, _80x_sequence)
-=======
 
 run2_miniAOD_80XLegacy.toReplaceWith( nanoSequenceCommon, _80x_sequence)
 
@@ -374,4 +347,4 @@ _102x_sequence.insert(_102x_sequence.index(simpleCleanerTable)+1,extraFlagsTable
 
 for modifier in run2_nanoAOD_94XMiniAODv1, run2_nanoAOD_94XMiniAODv2, run2_nanoAOD_102Xv1:
     modifier.toReplaceWith(nanoSequenceCommon, _102x_sequence)
->>>>>>> official-cmssw/master
+
