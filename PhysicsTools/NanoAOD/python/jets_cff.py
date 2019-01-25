@@ -110,12 +110,28 @@ for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016:
             tightIdLepVeto = None,
     )
 
+lepInJetVars = cms.EDProducer("LepInJetProducer",
+     srcPF = cms.InputTag("packedPFCandidates"),
+     src = cms.InputTag("slimmedJetsAK8"),
+     srcEle = cms.InputTag("slimmedElectrons"),
+     srcMu = cms.InputTag("slimmedMuons")
+)
+
 slimmedJetsAK8WithUserData = cms.EDProducer("PATJetUserDataEmbedder",
      src = cms.InputTag("slimmedJetsAK8"),
-     userFloats = cms.PSet(),
+     userFloats = cms.PSet(
+        lsf3 = cms.InputTag("lepInJetVars:lsf3"),
+        lmd3 = cms.InputTag("lepInJetVars:lmd3"),
+        lep3pt = cms.InputTag("lepInJetVars:lep3pt"),
+        lep3eta = cms.InputTag("lepInJetVars:lep3eta"),
+        lep3phi = cms.InputTag("lepInJetVars:lep3phi"),
+        lsf3match = cms.InputTag("lepInJetVars:lsf3match"),
+     ),
      userInts = cms.PSet(
         tightId = cms.InputTag("tightJetIdAK8"),
         tightIdLepVeto = cms.InputTag("tightJetIdLepVetoAK8"),
+        lep3id =  cms.InputTag("lepInJetVars:lep3id"),
+        lep3idmatch =  cms.InputTag("lepInJetVars:lep3idmatch"),
      ),
 )
 for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016:
@@ -372,7 +388,14 @@ fatJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
 		     doc="index of first subjet"),
         subJetIdx2 = Var("?nSubjetCollections()>0 && subjets('SoftDropPuppi').size()>1?subjets('SoftDropPuppi')[1].key():-1", int,
 		     doc="index of second subjet"),
-
+        lsf3 = Var("userFloat('lsf3')",float, doc="LSF (3 subjets)",precision=10),
+        lmd3 = Var("userFloat('lmd3')",float, doc="LMD (3 subjets)",precision=10),
+        lep3pt = Var("userFloat('lep3pt')",float, doc="Lep pT (3 subjets)",precision=10),
+        lep3phi = Var("userFloat('lep3phi')",float, doc="Lep phi (3 subjets)",precision=10),
+        lep3eta = Var("userFloat('lep3eta')",float, doc="Lep eta (3 subjets)",precision=10),
+        lep3id = Var("userInt('lep3id')",int, doc="Lep id (3 subjets)"),
+        lsf3match = Var("userFloat('lsf3match')",float, doc="LSF match to RECO (3 subjets)",precision=10),
+        lep3idmatch = Var("userInt('lep3idmatch')",int, doc="Lep id match to RECO (3 subjets)"),
 #        btagDeepC = Var("bDiscriminator('pfDeepCSVJetTags:probc')",float,doc="CMVA V2 btag discriminator",precision=10),
 #puIdDisc = Var("userFloat('pileupJetId:fullDiscriminant')",float,doc="Pilup ID discriminant",precision=10),
 #        nConstituents = Var("numberOfDaughters()",int,doc="Number of particles in the jet"),
@@ -532,7 +555,7 @@ run2_miniAOD_80XLegacy.toModify( genJetFlavourTable, jetFlavourInfos = cms.Input
 run2_nanoAOD_92X.toModify( genJetFlavourTable, jetFlavourInfos = cms.InputTag("genJetFlavourAssociation"),)
 
 #before cross linking
-jetSequence = cms.Sequence(tightJetId+tightJetIdLepVeto+bJetVars+slimmedJetsWithUserData+jetCorrFactorsNano+updatedJets+tightJetIdAK8+tightJetIdLepVetoAK8+slimmedJetsAK8WithUserData+jetCorrFactorsAK8+updatedJetsAK8+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8)
+jetSequence = cms.Sequence(tightJetId+tightJetIdLepVeto+bJetVars+slimmedJetsWithUserData+jetCorrFactorsNano+updatedJets+lepInJetVars+tightJetIdAK8+tightJetIdLepVetoAK8+slimmedJetsAK8WithUserData+jetCorrFactorsAK8+updatedJetsAK8+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8)
 
 from RecoJets.JetProducers.QGTagger_cfi import  QGTagger
 qgtagger80x=QGTagger.clone(srcJets="slimmedJets",srcVertexCollection="offlineSlimmedPrimaryVertices")

@@ -230,6 +230,7 @@ def nanoAOD_addDeepInfoAK8(process,addDeepBTag,addDeepBoostedJet,jecPayload):
     process.looseJetIdAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.tightJetIdAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.tightJetIdLepVetoAK8.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
+    process.lepInJetVars.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     process.slimmedJetsAK8WithUserData.src = "selectedUpdatedPatJetsAK8WithDeepInfo"
     return process
 
