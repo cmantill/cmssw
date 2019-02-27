@@ -1334,7 +1334,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         retVal = None
         if input is None:
             retVal = self._defaultParameters[default].value
-        elif isinstance(input, str):
+        elif type(input) == str:
             retVal = cms.InputTag(input)
         else:
             retVal = input
@@ -1553,11 +1553,12 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         
             #extractor for caloMET === temporary for the beginning of the data taking
             self.extractMET(process,"rawCalo",patMetModuleSequence,postfix)
-            caloMetName="metrawCalo" if hasattr(process,"metrawCalo") else "metrawCalo"+postfix
+            #caloMetName="metrawCalo" if hasattr(process,"metrawCalo") else "metrawCalo"+postfix
             from PhysicsTools.PatAlgos.tools.metTools import addMETCollection
             addMETCollection(process,
                              labelName = "patCaloMet",
-                             metSource = caloMetName
+                             #metSource = caloMetName
+                             metSource = "metrawCalo"+postfix if not self._parameters["Puppi"].value else "metrawCaloV2"
                              )
             getattr(process,"patCaloMet").addGenMET = False
 
