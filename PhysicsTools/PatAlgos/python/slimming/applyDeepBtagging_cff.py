@@ -62,9 +62,18 @@ def applyDeepBtagging( process, postfix="" ) :
        btagDiscriminators = [
           'pfDeepDoubleBJetTags:probQ',
           'pfDeepDoubleBJetTags:probH',
-       ],
-#        ] + pfDeepBoostedJetTagsAll,  # uncomment it to test DeepBoostedJet
-       postfix = 'SlimmedAK8DeepTags'+postfix,
+          #'pfDeepDoubleCvLJetTags:probQCD',
+          #'pfDeepDoubleCvLJetTags:probHcc',
+          #'pfDeepDoubleCvBJetTags:probHbb',
+          #'pfDeepDoubleCvBJetTags:probHcc',
+          #'pfMassIndependentDeepDoubleBvLJetTags:probQCD',
+          #'pfMassIndependentDeepDoubleBvLJetTags:probHbb',
+          #'pfMassIndependentDeepDoubleCvLJetTags:probQCD',
+          #'pfMassIndependentDeepDoubleCvLJetTags:probHcc',
+          #'pfMassIndependentDeepDoubleCvBJetTags:probHbb',
+          #'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
+       ] # + pfDeepBoostedJetTagsAll
+       ,postfix = 'SlimmedAK8DeepTags'+postfix,
        printWarning = False
     )
 
