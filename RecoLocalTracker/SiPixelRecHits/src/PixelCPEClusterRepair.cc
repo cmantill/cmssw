@@ -109,7 +109,7 @@ PixelCPEClusterRepair::PixelCPEClusterRepair(edm::ParameterSet const & conf,
    }
 
    // do not recommend 2D if theMagField!=3.8
-   if(theMagField>=3.65 && theMagField<3.9){
+   if(theMagField<3.65 || theMagField>=3.9){
      recommend2D_.clear();
    }
 
