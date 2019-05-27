@@ -37,6 +37,7 @@ public:
     srcMu_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("srcMu")))
   {
     produces<edm::ValueMap<float>>("lsf3");
+    produces<edm::ValueMap<float>>("dRLep");
     produces<edm::ValueMap<int>>("muIdx3SJ");
     produces<edm::ValueMap<int>>("eleIdx3SJ");
   }
@@ -79,6 +80,7 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     unsigned int nMu  = srcMu->size();
 
     std::vector<float> *vlsf3 = new std::vector<float>;
+    std::vector<float> *vdRLep = new std::vector<float>;
     std::vector<int> *vmuIdx3SJ = new std::vector<int>;
     std::vector<int> *veleIdx3SJ = new std::vector<int>;
 
@@ -98,7 +100,7 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       }
 
       // match to leading and closest electron or muon
-      double dRmin(0.8),dRele(999),dRmu(999),dRtmp(999);
+      double dRmin(0.8),dRele(999),dRmu(999),dRtmp(999),dRLep(-1);
       for (unsigned int il(0); il < nEle; il++) {
 	auto itLep = srcEle->ptrAt(il);
 	if(matchByCommonSourceCandidatePtr(*itLep,itJet)){
@@ -114,6 +116,7 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
 	  }
 	} 
       }
+      if(dRele < 0.8) dRLep = dRele;
       for (unsigned int il(0); il < nMu; il++) {
         auto itLep = srcMu->ptrAt(il);
         if(matchByCommonSourceCandidatePtr(*itLep,itJet)){
@@ -130,11 +133,13 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
 	  }
         }
       }
+      if(dRmu < 0.8) dRLep =dRmu;
 
       std::vector<fastjet::PseudoJet> psub_3;
       std::sort(lClusterParticles.begin(),lClusterParticles.end(),orderPseudoJet);
       auto lsf_3 = calculateLSF(lClusterParticles, psub_3, lepPt, lepEta, lepPhi, lepId, 2.0, 3);
       vlsf3->push_back( std::get<0>(lsf_3));
+      vdRLep->push_back( dRLep );
       veleIdx3SJ->push_back( ele_pfmatch_index );
       vmuIdx3SJ->push_back( mu_pfmatch_index );
     }
@@ -146,6 +151,12 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     fillerlsf3.insert(srcJet,vlsf3->begin(),vlsf3->end());
     fillerlsf3.fill();
     iEvent.put(std::move(lsf3V),"lsf3");
+
+    std::unique_ptr<edm::ValueMap<float>> dRLepV(new edm::ValueMap<float>());
+    edm::ValueMap<float>::Filler fillerdRLep(*dRLepV);
+    fillerdRLep.insert(srcJet,vdRLep->begin(),vdRLep->end());
+    fillerdRLep.fill();
+    iEvent.put(std::move(dRLepV),"dRLep");
 
     std::unique_ptr<edm::ValueMap<int>> muIdx3SJV(new edm::ValueMap<int>());
     edm::ValueMap<int>::Filler fillermuIdx3SJ(*muIdx3SJV);
