@@ -160,10 +160,43 @@ lepInJetVars = cms.EDProducer("LepInJetProducer",
      srcMu = cms.InputTag("slimmedMuons")
 )
 
+#substructureVars = cms.EDProducer("JetSubstructureProducer",
+#     srcPF = cms.InputTag("packedPFCandidates"),
+#     src = cms.InputTag("updatedJetsAK8"),
+#)
+from RecoJets.JetProducers.ECFAdder_cfi import ECFAdder
+
+ecfNbeta1 = ECFAdder.clone(
+             src = cms.InputTag("updatedJetsAK8"),
+             ecftype = cms.string("N")
+             )
+
+ecfMbeta1 = ECFAdder.clone(
+             src = cms.InputTag("updatedJetsAK8"),
+             ecftype = cms.string("M")
+             )
+
+ecfDbeta1 = ECFAdder.clone(
+             src = cms.InputTag("updatedJetsAK8"),
+             ecftype = cms.string("D")
+             )
+
+ecfUbeta1 = ECFAdder.clone(
+             src = cms.InputTag("updatedJetsAK8"),
+             ecftype = cms.string("U")
+             )
+
 updatedJetsAK8WithUserData = cms.EDProducer("PATJetUserDataEmbedder",
      src = cms.InputTag("updatedJetsAK8"),
      userFloats = cms.PSet(
         lsf3 = cms.InputTag("lepInJetVars:lsf3"),
+        dRLep = cms.InputTag("lepInJetVars:dRLep"),
+        n2b1 = cms.InputTag("ecfNbeta1:ecfN2"),
+        d2b1 = cms.InputTag("ecfDbeta1:ecfD2"),
+        m2b1 = cms.InputTag("ecfMbeta1:ecfM2"),
+        n3b1 = cms.InputTag("ecfNbeta1:ecfN3"),
+        u3b1 = cms.InputTag("ecfUbeta1:ecfU3"),
+        u2b1 = cms.InputTag("ecfUbeta1:ecfU2"),
      ),
      userInts = cms.PSet(
         tightId = cms.InputTag("tightJetIdAK8"),
@@ -177,6 +210,38 @@ for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016:
             looseId = cms.InputTag("looseJetIdAK8"),
     )
 
+lepInJetMVA = cms.EDProducer("JetBaseMVAValueMapProducer",
+    src = cms.InputTag("updatedJetsAK8WithUserData"),
+    weightFile =  cms.FileInPath("PhysicsTools/NanoAOD/data/lsf3bdt_BDT.weights.xml"),
+    name = cms.string("lepInJetMVA"),
+    isClassifier = cms.bool(True),
+    variablesOrder = cms.vstring(["clf_LSF3","clf_dRLep",
+                                  "n2b1:=clf_e3_v2_sdb1/(clf_e2_sdb1*clf_e2_sdb1)",
+                                  "m2b1:=clf_e3_v1_sdb1/clf_e2_sdb1",
+                                  "d2b1:=clf_e3_sdb1/(clf_e2_sdb1*clf_e2_sdb1*clf_e2_sdb1)",
+                                  "n3b1:=clf_e4_v2_sdb1/(clf_e3_v1_sdb1*clf_e3_v1_sdb1)",
+                                  "tau21:=clf_Tau2/clf_Tau1",
+                                  "tau31:=clf_Tau3/clf_Tau1",
+                                  "tau32:=clf_Tau3/clf_Tau2",
+                                  "tau43:=clf_Tau4/clf_Tau3",
+                                  "u3b1:=clf_e4_v1_sdb1",
+                                  "u2b1:=clf_e3_v1_sdb1",
+                                  ]),
+    variables = cms.PSet(
+        clf_LSF3 = cms.string("userFloat('lsf3')"),
+        clf_dRLep = cms.string("userFloat('dRLep')"),                                                                                                                         
+        n2b1 = cms.string("userFloat('n2b1')"),
+        m2b1 = cms.string("userFloat('m2b1')"),
+        d2b1 = cms.string("userFloat('d2b1')"),
+        n3b1 = cms.string("userFloat('n3b1')"),
+        tau21 = cms.string("userFloat('NjettinessAK8Puppi:tau2')/userFloat('NjettinessAK8Puppi:tau1')"),
+        tau31 = cms.string("userFloat('NjettinessAK8Puppi:tau3')/userFloat('NjettinessAK8Puppi:tau1')"),
+        tau32 = cms.string("userFloat('NjettinessAK8Puppi:tau3')/userFloat('NjettinessAK8Puppi:tau2')"),
+        tau43 = cms.string("userFloat('NjettinessAK8Puppi:tau4')/userFloat('NjettinessAK8Puppi:tau3')"),
+        u3b1 = cms.string("userFloat('u3b1')"),
+        u2b1 = cms.string("userFloat('u2b1')"),
+    )
+)
 
 finalJets = cms.EDFilter("PATJetRefSelector",
     src = cms.InputTag("updatedJetsWithUserData"),
@@ -407,7 +472,10 @@ fatJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
 #puIdDisc = Var("userFloat('pileupJetId:fullDiscriminant')",float,doc="Pilup ID discriminant",precision=10),
 #        nConstituents = Var("numberOfDaughters()",int,doc="Number of particles in the jet"),
 #        rawFactor = Var("1.-jecFactor('Uncorrected')",float,doc="1 - Factor to get back to raw pT",precision=6),
-    )
+    ),
+    externalVariables = cms.PSet(
+        mvalepInJet = ExtVar(cms.InputTag("lepInJetMVA"),float, doc="Lep in Jet MVA",precision=14),
+    ),
 )
 ### Era dependent customization
 run2_miniAOD_80XLegacy.toModify( bjetNN,outputFormulas = cms.vstring(["at(0)*0.31628304719924927+1.0454729795455933","0.5*(at(2)-at(1))*0.31628304719924927"]))
@@ -571,7 +639,8 @@ from RecoJets.JetProducers.QGTagger_cfi import  QGTagger
 qgtagger=QGTagger.clone(srcJets="updatedJets",srcVertexCollection="offlineSlimmedPrimaryVertices")
 
 #before cross linking
-jetSequence = cms.Sequence(jetCorrFactorsNano+updatedJets+tightJetId+tightJetIdLepVeto+bJetVars+jercVars+qgtagger+updatedJetsWithUserData+jetCorrFactorsAK8+updatedJetsAK8+tightJetIdAK8+tightJetIdLepVetoAK8+lepInJetVars+updatedJetsAK8WithUserData+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8)
+jetSequence = cms.Sequence(jetCorrFactorsNano+updatedJets+tightJetId+tightJetIdLepVeto+bJetVars+jercVars+qgtagger+updatedJetsWithUserData+jetCorrFactorsAK8+updatedJetsAK8+tightJetIdAK8+tightJetIdLepVetoAK8+lepInJetVars+ecfNbeta1+ecfMbeta1+ecfDbeta1+ecfUbeta1+updatedJetsAK8WithUserData+chsForSATkJets+softActivityJets+softActivityJets2+softActivityJets5+softActivityJets10+finalJets+finalJetsAK8)
+
 
 _jetSequence_2016 = jetSequence.copy()
 _jetSequence_2016.insert(_jetSequence_2016.index(tightJetId), looseJetId)
@@ -580,7 +649,7 @@ for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016:
     modifier.toReplaceWith(jetSequence, _jetSequence_2016)
 
 #after cross linkining
-jetTables = cms.Sequence(bjetMVA+bjetNN+jetTable+fatJetTable+subJetTable+saJetTable+saTable)
+jetTables = cms.Sequence(bjetMVA+bjetNN+jetTable+lepInJetMVA+fatJetTable+subJetTable+saJetTable+saTable)
 
 #MC only producers and tables
 jetMC = cms.Sequence(jetMCTable+genJetTable+patJetPartons+genJetFlavourTable+genJetAK8Table+genJetAK8FlavourAssociation+genJetAK8FlavourTable+genSubJetAK8Table)
