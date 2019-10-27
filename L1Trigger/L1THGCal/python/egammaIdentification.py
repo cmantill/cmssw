@@ -70,25 +70,25 @@ working_points_drnn_dbscan = [
 # Identification for 3D HistoMax clustering (as in 3.5.2)
 bdt_weights_histomax = [
         # Low eta
-        'L1Trigger/L1THGCal/data/egamma_id_histomax_352_loweta_v0.xml',
+        'L1Trigger/L1THGCal/data/egid_histomax_loweta.xml',
         # High eta
-        'L1Trigger/L1THGCal/data/egamma_id_histomax_352_higheta_v0.xml',
+        'L1Trigger/L1THGCal/data/egid_histomax_higheta.xml',
         ]
 
 working_points_histomax = [
         # Low eta
         {
-        '900':0.19146989,
-        '950':0.1379665 ,
-        '975':0.03496629,
-        '995':-0.24383164,
+        '995': -0.9635030, # epsilon_b = 0.1135
+        '975': -0.2973018, # epsilon_b = 0.0584
+        '950': 0.4912865, # epsilon_b = 0.0439
+        '900': 0.8831878, # epsilon_b = 0.0305
         },
         # High eta
         {
-        '900':0.13347613,
-        '950':0.04267797,
-        '975':-0.03698097,
-        '995':-0.23077505,
+        '995': -0.9964944, # epsilon_b = 0.4657
+        '975': -0.8169104, # epsilon_b = 0.1600
+        '950': -0.0011038, # epsilon_b = 0.0800
+        '900': 0.6431891, # epsilon_b = 0.0514
         },
         ]
 
@@ -117,7 +117,7 @@ egamma_identification_drnn_dbscan = cms.PSet(
         )
 
 egamma_identification_histomax = cms.PSet(
-        Inputs=cms.vstring('cl3d_firstlayer', 'cl3d_coreshowerlength', 'cl3d_maxlayer', 'cl3d_srrmean'),
+        Inputs=cms.vstring('cl3d_coreshowerlength', 'cl3d_showerlength', 'cl3d_firstlayer', 'cl3d_maxlayer', 'cl3d_szz', 'cl3d_srrmean', 'cl3d_srrtot', 'cl3d_seetot', 'cl3d_spptot'),
         CategoriesEtaMin=cms.vdouble([cat.eta_min for cat in categories]),
         CategoriesEtaMax=cms.vdouble([cat.eta_max for cat in categories]),
         CategoriesPtMin=cms.vdouble([cat.pt_min for cat in categories]),

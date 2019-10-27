@@ -101,5 +101,5 @@ class HGCalTriggerChains:
         process.globalReplace('hgcalBackEndLayer1', backend1_task)
         process.globalReplace('hgcalBackEndLayer2', backend2_task)
         process.globalReplace('hgcalTriggerSelector', selector_sequence)
-        process.globalReplace('hgcalTriggerNtuples', ntuple_sequence)
+        # process.globalReplace('hgcalTriggerNtuples', ntuple_sequence)
         return process

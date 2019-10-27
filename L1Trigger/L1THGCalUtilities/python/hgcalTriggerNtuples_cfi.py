@@ -79,7 +79,9 @@ from L1Trigger.L1THGCal.egammaIdentification import egamma_identification_histom
 ntuple_multiclusters = cms.PSet(
     NtupleName = cms.string('HGCalTriggerNtupleHGCMulticlusters'),
     Multiclusters = cms.InputTag('hgcalBackEndLayer2Producer:HGCalBackendLayer2Processor3DClustering'),
-    EGIdentification = egamma_identification_histomax.clone()
+    EGIdentification = egamma_identification_histomax.clone(),
+    FillLayerInfo = cms.bool(False),
+    FillInterpretationInfo = cms.bool(True)
 )
 
 ntuple_panels = cms.PSet(
