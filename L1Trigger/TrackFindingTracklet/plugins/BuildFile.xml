@@ -6,8 +6,10 @@
   <use   name="PhysicsTools/UtilAlgos"/>
   <use   name="CommonTools/UtilAlgos"/>
   <use   name="DataFormats/L1TrackTrigger"/>
+  <use   name="DataFormats/TrackReco"/>
   <use   name="hepmc"/>
   <use   name="root"/>
   <use   name="L1Trigger/TrackFindingTMTT"/>
+  <use   name="RecoPixelVertexing/PixelTrackFitting"/>
   <flags   EDM_PLUGIN="1"/>
 </library>
