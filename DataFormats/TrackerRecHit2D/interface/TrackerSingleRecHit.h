@@ -4,6 +4,7 @@
 
 #include "DataFormats/TrackerRecHit2D/interface/BaseTrackerRecHit.h"
 #include "DataFormats/TrackerRecHit2D/interface/OmniClusterRef.h"
+
 #include "Geometry/CommonDetUnit/interface/GeomDet.h"
 
 
@@ -22,7 +23,7 @@ public:
   typedef OmniClusterRef::ClusterStripRef ClusterStripRef;
   typedef OmniClusterRef::Phase2Cluster1DRef ClusterPhase2Ref;
   typedef OmniClusterRef::ClusterMTDRef ClusterMTDRef;
-
+  typedef OmniClusterRef::ClusterL1Ref ClusterL1Ref;
 
   // no position (as in persistent)
   TrackerSingleRecHit(DetId id,
@@ -70,6 +71,10 @@ public:
     return cluster_.cluster_mtd();
   }
 
+  ClusterL1Ref cluster_L1() const {
+    return cluster_.cluster_L1();
+  }
+
   SiStripCluster const & stripCluster() const { 
     return cluster_.stripCluster();
   }  
@@ -86,11 +91,16 @@ public:
     return cluster_.mtdCluster();
   }
 
+  TTCluster< Ref_Phase2TrackerDigi_ >  const & L1Cluster() const {
+    return cluster_.L1Cluster();
+  }
+
   // void setClusterRef(const &  OmniClusterRef ref) {  cluster_ =ref;}
   void setClusterPixelRef(ClusterPixelRef const & ref) {  cluster_ = OmniClusterRef(ref); }
   void setClusterStripRef(ClusterStripRef const & ref) {  cluster_ = OmniClusterRef(ref); }
   void setClusterPhase2Ref(ClusterPhase2Ref const & ref) { cluster_ = OmniClusterRef(ref); }
   void setClusterMTDRef(ClusterMTDRef const & ref) { cluster_ = OmniClusterRef(ref); }
+  void setClusterL1Ref(ClusterL1Ref const & ref) { cluster_ = OmniClusterRef(ref); }
 
   bool sharesInput( const TrackingRecHit* other, SharedInputType what) const  final;
 
