@@ -190,4 +190,15 @@
   <class name="MTDTrackingOwnVector"/>
   <class name="edm::Wrapper< MTDTrackingOwnVector >"/>
 
+  <class name="L1TrackingRecHit" ClassVersion="4">
+   <version ClassVersion="4" checksum="1649740079"/>
+    <version ClassVersion="3" checksum="1649740079"/>
+  </class>
+
+  <class name="std::vector<L1TrackingRecHit>"/>                                                                                                                                     
+  <class name="L1TrackingDetSetVector"/>
+  <class name="edm::Wrapper< L1TrackingDetSetVector >"/>                                                                                                                            
+  <class name="L1TrackingOwnVector"/>
+  <class name="edm::Wrapper< L1TrackingOwnVector >"/>    
+
 </lcgdict>

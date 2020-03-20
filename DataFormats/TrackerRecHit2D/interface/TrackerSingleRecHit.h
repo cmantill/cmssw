@@ -18,6 +18,7 @@ public:
   typedef OmniClusterRef::ClusterStripRef ClusterStripRef;
   typedef OmniClusterRef::Phase2Cluster1DRef ClusterPhase2Ref;
   typedef OmniClusterRef::ClusterMTDRef ClusterMTDRef;
+  typedef OmniClusterRef::ClusterL1Ref ClusterL1Ref;
 
   // no position (as in persistent)
   TrackerSingleRecHit(DetId id, OmniClusterRef const& clus) : Base(id, trackerHitRTTI::single), cluster_(clus) {}
@@ -52,6 +53,10 @@ public:
 
   ClusterMTDRef cluster_mtd() const { return cluster_.cluster_mtd(); }
 
+  ClusterL1Ref cluster_L1() const {
+    return cluster_.cluster_L1();
+  }
+
   SiStripCluster const& stripCluster() const { return cluster_.stripCluster(); }
 
   SiPixelCluster const& pixelCluster() const { return cluster_.pixelCluster(); }
@@ -60,11 +65,16 @@ public:
 
   FTLCluster const& mtdCluster() const { return cluster_.mtdCluster(); }
 
+  TTCluster< Ref_Phase2TrackerDigi_ >  const & L1Cluster() const {
+    return cluster_.L1Cluster();
+  }
+
   // void setClusterRef(const &  OmniClusterRef ref) {  cluster_ =ref;}
   void setClusterPixelRef(ClusterPixelRef const& ref) { cluster_ = OmniClusterRef(ref); }
   void setClusterStripRef(ClusterStripRef const& ref) { cluster_ = OmniClusterRef(ref); }
   void setClusterPhase2Ref(ClusterPhase2Ref const& ref) { cluster_ = OmniClusterRef(ref); }
   void setClusterMTDRef(ClusterMTDRef const& ref) { cluster_ = OmniClusterRef(ref); }
+  void setClusterL1Ref(ClusterL1Ref const & ref) { cluster_ = OmniClusterRef(ref); }
 
   bool sharesInput(const TrackingRecHit* other, SharedInputType what) const final;
 
