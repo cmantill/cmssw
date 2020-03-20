@@ -42,7 +42,7 @@ TrackProducer::TrackProducer(const edm::ParameterSet& iConfig)
 }
 
 void TrackProducer::produce(edm::Event& theEvent, const edm::EventSetup& setup) {
-  LogDebug("TrackProducer") << "Analyzing event number: " << theEvent.id() << "\n";
+  std::cout << "TrackProducer: " << "Analyzing event number: " << theEvent.id() << "\n";
   //
   // create empty output collections
   //
@@ -75,10 +75,11 @@ void TrackProducer::produce(edm::Event& theEvent, const edm::EventSetup& setup) 
   getFromEvt(theEvent, theTCCollection, bs);
   //protect against missing product
   if (theTCCollection.failedToGet()) {
-    edm::LogError("TrackProducer") << "could not get the TrackCandidateCollection.";
+    std::cout << "TrackProducer: " << "could not get the TrackCandidateCollection." << std::endl;
   } else {
-    LogDebug("TrackProducer") << "run the algorithm"
-                              << "\n";
+    std::cout << "TrackProducer: " << "run the algorithm"
+	      << "\n";
+
     try {
       theAlgo.runWithCandidate(theG.product(),
                                theMF.product(),
