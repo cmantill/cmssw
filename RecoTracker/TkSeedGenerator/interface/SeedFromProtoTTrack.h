@@ -54,7 +54,8 @@ private:
   typedef edm::OwnVector<TrackingRecHit> RecHitContainer;
   const RecHitContainer& hits() const { return theHits; }
 
-private:
+  CurvilinearTrajectoryError initialError(float sin2Theta, const TTTrack< Ref_Phase2TrackerDigi_ >& proto) const dso_hidden;
+
   bool theValid;
   RecHitContainer theHits;
   PTrajectoryStateOnDet thePTraj;
