@@ -2,12 +2,12 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "SeedGeneratorFromRegionHitsEDProducer.h"
 #include "SeedGeneratorFromProtoTracksEDProducer.h"
-#include "SeedGeneratorFromProtoTTracksEDProducer.h"
+#include "SeedGeneratorFromTTracksEDProducer.h"
 #include "SeedCombiner.h"
 
 DEFINE_FWK_MODULE(SeedGeneratorFromRegionHitsEDProducer);
 DEFINE_FWK_MODULE(SeedGeneratorFromProtoTracksEDProducer);
-DEFINE_FWK_MODULE(SeedGeneratorFromProtoTTracksEDProducer);
+DEFINE_FWK_MODULE(SeedGeneratorFromTTracksEDProducer);
 DEFINE_FWK_MODULE(SeedCombiner);
 
 #include "RecoTracker/TkSeedGenerator/interface/SeedCreatorFactory.h"
