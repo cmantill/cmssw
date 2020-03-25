@@ -74,7 +74,7 @@ void SeedGeneratorFromTTracksEDProducer::findSeedsOnLayer(const GeometricSearchD
       //dets.front().second.rescaleError(errorSFHitless);
       PTrajectoryStateOnDet const& ptsod = trajectoryStateTransform::persistentState(tsosOnLayer, detOnLayer->geographicalId().rawId());
       TrajectorySeed::recHitContainer rHC;
-      out->push_back(TrajectorySeed(ptsod, rHC, oppositeToMomentum));
+      out->push_back(TrajectorySeed(ptsod, rHC, alongMomentum));
       std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) done " << std::endl;
       numSeedsMade++;
     }
@@ -154,36 +154,46 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
                          out);
       }
     }
-    // //ENDCAP+
-    // if (l1.momentum().eta() > theMinEtaForTEC) {
-    //   for (auto it = tecPositive.rbegin(); it != tecPositive.rend(); ++it) {
-    // 	std::cout << "SeedGeneratorFromTTracks::produce: looping in TEC+ layer " << std::endl;
-    //     findSeedsOnLayer(**it,
-    //                      tsosAtIP,
-    //                      *(propagatorAlong.get()),
-    //                      l1,
-    //                      estimatorH,
-    //                      out);
-    //   }
-    // }
-    // //ENDCAP-
-    // if (l1.momentum().eta() < -theMinEtaForTEC) {
-    //   for (auto it = tecNegative.rbegin(); it != tecNegative.rend(); ++it) {
-    // 	std::cout << "SeedGeneratorFromTTracks::produce: looping in TEC- layer "  << std::endl;
-    //     findSeedsOnLayer(**it,
-    //                      tsosAtIP,
-    //                      *(propagatorAlong.get()),
-    //                      l1,
-    //                      estimatorH,
-    //                      out);
-    //   }
-    // }
+    //ENDCAP+
+    if (l1.momentum().eta() > theMinEtaForTEC) {
+      for (auto it = tecPositive.rbegin(); it != tecPositive.rend(); ++it) {
+    	std::cout << "SeedGeneratorFromTTracks::produce: looping in TEC+ layer " << std::endl;
+        findSeedsOnLayer(**it,
+                         tsosAtIP,
+                         *(propagatorAlong.get()),
+                         l1,
+                         estimatorH,
+			 numSeedsMade,
+                         out);
+      }
+    }
+    //ENDCAP-
+    if (l1.momentum().eta() < -theMinEtaForTEC) {
+      for (auto it = tecNegative.rbegin(); it != tecNegative.rend(); ++it) {
+    	std::cout << "SeedGeneratorFromTTracks::produce: looping in TEC- layer "  << std::endl;
+        findSeedsOnLayer(**it,
+                         tsosAtIP,
+                         *(propagatorAlong.get()),
+                         l1,
+                         estimatorH,
+			 numSeedsMade,
+                         out);
+      }
+    }
     for (std::vector<TrajectorySeed>::iterator it = out->begin(); it != out->end(); ++it) {
       result->push_back(*it);
     }
   } // end loop over L1Tracks
   
   std::cout << "SeedGeneratorFromTTracks::produce: number of seeds made: " << result->size() << std::endl;
+  auto const& seeds = *result;
+
+  for (auto i = 0U; i < result->size(); ++i) {
+    std::cout << "SeedGeneratorFromTTracks::startingState pt " << seeds[i].startingState().pt() << std::endl;
+    std::cout << "SeedGeneratorFromTTracks::seedDirection " << seeds[i].direction() << " and nHits " << seeds[i].nHits() << std::endl;
+  };
+  //TempTrajectory out(seed.direction(), seed.nHits());
+  //seedMeasurements(seed, result, theSeedAs5DHit);
 
   ev.put(std::move(result));
   std::cout << "SeedGeneratorFromTTracks::end " << std::endl;
