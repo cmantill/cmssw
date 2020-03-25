@@ -67,6 +67,32 @@ namespace trajectoryStateTransform {
     return FreeTrajectoryState(par, err);
   }
 
+  FreeTrajectoryState initialFreeStateTTrack(const TTTrack< Ref_Phase2TrackerDigi_ >& tk, const MagneticField* field, bool withErr) {
+    Basic3DVector<float> pos(tk.POCA());
+    GlobalPoint gpos(pos);
+    Basic3DVector<float> mom(tk.momentum());
+    GlobalVector gmom(mom);
+    // no track charge so used track transverse curvature curvature
+    int dummy=0;
+    float speedOfLightConverted = CLHEP::c_light/1.0E5; // B*c/2E11 - converts q/pt to track angle at some radius from beamline
+    double mMagneticFieldStrength = field->inTesla(GlobalPoint(0,0,0)).z();
+    float trk_signedPt = speedOfLightConverted * mMagneticFieldStrength / tk.rInv(); // transverse curvature
+    GlobalTrajectoryParameters par(gpos, gmom, trk_signedPt, dummy, field);
+    if (!withErr)
+      return FreeTrajectoryState(par);
+    CurvilinearTrajectoryError newError;  // zeroed                                                                                                                            
+    auto& C = newError.matrix();
+    auto sin2Theta = par.momentum().perp2() / par.momentum().mag2(); 
+    AlgebraicSymMatrix55 mat;                                                                                                                                                      
+    double maxC00 = 1.0;
+    C[0][0] = std::max(0.1*sin2Theta, maxC00);
+    C[1][1] = std::abs(0.1*atan(tk.tanL()));
+    C[2][2] = std::abs(0.1*tk.phi());
+    C[3][3] = std::abs(0.1*tk.d0());
+    C[4][4] = std::abs(0.1*tk.z0());
+    return FreeTrajectoryState(par, newError);
+  }
+
   FreeTrajectoryState innerFreeState(const reco::Track& tk, const MagneticField* field, bool withErr) {
     Basic3DVector<float> pos(tk.innerPosition());
     GlobalPoint gpos(pos);
