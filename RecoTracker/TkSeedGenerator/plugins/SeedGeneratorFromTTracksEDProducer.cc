@@ -10,6 +10,8 @@
 #include "DataFormats/L1TrackTrigger/interface/TTTrack.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
@@ -22,31 +24,38 @@
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
 
+// extra
+#include "RecoTracker/TransientTrackingRecHit/interface/TkTransientTrackingRecHitBuilder.h"
+#include "RecoTracker/TransientTrackingRecHit/interface/TRecHit5DParamConstraint.h"
+#include "RecoTracker/CkfPattern/interface/BaseCkfTrajectoryBuilder.h"
+#include "RecoTracker/CkfPattern/interface/BaseCkfTrajectoryBuilderFactory.h"
+#include "RecoTracker/Record/interface/CkfComponentsRecord.h"
+#include "RecoTracker/Record/interface/TrackerRecoGeometryRecord.h"
+#include "RecoTracker/Record/interface/NavigationSchoolRecord.h"
+#include "TrackingTools/DetLayers/interface/NavigationSchool.h"
+#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
+
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <vector>
 
 using namespace edm;
 using namespace reco;
 
-void SeedGeneratorFromTTracksEDProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  edm::ParameterSetDescription desc;
-  desc.add<InputTag>("InputCollection", InputTag("pixelTracks"));
-  desc.add<std::string>("estimator", "hltESPChi2MeasurementEstimator100");
-  desc.add<std::string>("propagatorName", "PropagatorWithMaterial");
-  desc.add<edm::InputTag>("MeasurementTrackerEvent", edm::InputTag("hltSiStripClusters"));
-  desc.add<double>("maxEtaForTOB", 1.2);
-  desc.add<double>("minEtaForTEC", 0.8);
-  descriptions.add("SeedGeneratorFromTTracksEDProducer", desc);
-}
+namespace {
+  auto createBaseCkfTrajectoryBuilder(const edm::ParameterSet& pset, edm::ConsumesCollector&& iC) {
+    return BaseCkfTrajectoryBuilderFactory::get()->create(pset.getParameter<std::string>("ComponentType"), pset, iC);
+  }
+}  // namespace
 
 SeedGeneratorFromTTracksEDProducer::SeedGeneratorFromTTracksEDProducer(const ParameterSet& cfg)
     : theConfig(cfg),
       theInputCollectionTag(consumes<std::vector< TTTrack< Ref_Phase2TrackerDigi_ >>>(cfg.getParameter<InputTag>("InputCollection"))),
       theEstimatorName(cfg.getParameter<std::string>("estimator")),
-      thePropagatorName(cfg.getParameter<std::string>("propagatorName")),
+      thePropagatorName(cfg.getParameter<std::string>("propagator")),
       theMeasurementTrackerTag(consumes<MeasurementTrackerEvent>(cfg.getParameter<edm::InputTag>("MeasurementTrackerEvent"))),
       theMinEtaForTEC(cfg.getParameter<double>("minEtaForTEC")),
-      theMaxEtaForTOB(cfg.getParameter<double>("maxEtaForTOB"))
+      theMaxEtaForTOB(cfg.getParameter<double>("maxEtaForTOB")),
+      theTrajectoryBuilder(createBaseCkfTrajectoryBuilder(cfg.getParameter<edm::ParameterSet>("TrajectoryBuilderPSet"), consumesCollector()))
 {
   //produces<std::vector<TrajectorySeed> >();
   produces<TrajectorySeedCollection>();
@@ -75,13 +84,13 @@ void SeedGeneratorFromTTracksEDProducer::findSeedsOnLayer(const GeometricSearchD
       PTrajectoryStateOnDet const& ptsod = trajectoryStateTransform::persistentState(tsosOnLayer, detOnLayer->geographicalId().rawId());
       TrajectorySeed::recHitContainer rHC;
       out->push_back(TrajectorySeed(ptsod, rHC, alongMomentum));
-      std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) done " << std::endl;
+      std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) push seed " << std::endl;
       numSeedsMade++;
     }
   }
-  else{
-    std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless)  no dets " << std::endl;
-  }
+  //else{
+    //std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless)  no dets " << std::endl;
+  //}
 
 }
 
@@ -109,6 +118,7 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
   edm::ESHandle<Propagator> propagatorAlongH;
   es.get<TrackingComponentsRecord>().get(thePropagatorName, propagatorAlongH);
   std::unique_ptr<Propagator> propagatorAlong = SetPropagationDirection(*propagatorAlongH, alongMomentum);
+
 
   // Get vector of Detector layers 
   edm::Handle<MeasurementTrackerEvent> measurementTrackerH;
@@ -188,12 +198,54 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
   std::cout << "SeedGeneratorFromTTracks::produce: number of seeds made: " << result->size() << std::endl;
   auto const& seeds = *result;
 
-  for (auto i = 0U; i < result->size(); ++i) {
-    std::cout << "SeedGeneratorFromTTracks::startingState pt " << seeds[i].startingState().pt() << std::endl;
-    std::cout << "SeedGeneratorFromTTracks::seedDirection " << seeds[i].direction() << " and nHits " << seeds[i].nHits() << std::endl;
+  // Test on the fly the seeds
+
+  // navigation school
+  edm::ESHandle<NavigationSchool> nav;
+  es.get<NavigationSchoolRecord>().get("SimpleNavigationSchool", nav);
+  const NavigationSchool* navigation = nav.product();
+  theTrajectoryBuilder->setNavigationSchool(navigation);
+
+  // get the trajectory builder and initialize it with the data
+  //edm::Handle<MeasurementTrackerEvent> data;
+  //ev.getByToken(theMeasurementTrackerTag, data);
+  //edm::Handle<PixelClusterMask> pixelMask;
+  //e.getByToken(maskPixels_, pixelMask);
+  //edm::Handle<Phase2OTClusterMask> phase2OTMask;
+  //e.getByToken(maskPhase2OTs_, phase2OTMask);
+  //dataWithMasks = std::make_unique<MeasurementTrackerEvent>(*data, *pixelMask, *phase2OTMask);
+  std::cout << "set event " << std::endl;
+  theTrajectoryBuilder->setEvent(ev, es, &*measurementTrackerH);
+
+
+  for (unsigned i = 0; i < result->size(); ++i) {
+    std::cout << "SeedGeneratorFromTTracks:: startingState pt " << seeds[i].startingState().pt() << std::endl;
+    std::cout << "SeedGeneratorFromTTracks:: seedDirection " << seeds[i].direction() << " and nHits " << seeds[i].nHits() << std::endl;
+
+    //std::vector<Trajectory> theTmpTrajectories;
+    //unsigned int nCandPerSeed = 0;
+    //auto const& startTraj = theTrajectoryBuilder->buildTrajectories(seeds[i], theTmpTrajectories, nCandPerSeed, nullptr);
+    //std::cout << "SeedGeneratorFromTTracks:: tmp Traj size " << theTmpTrajectories.size() << " candsperSeed " << nCandPerSeed << std::endl;
+
+    TempTrajectory tmp(seeds[i].direction(), seeds[i].nHits());
+    //TrajectorySeed::range hitRange = seeds[i].recHits();
+    PTrajectoryStateOnDet pState(seeds[i].startingState());
+    const GeomDet* gdet = measurementTrackerH->geomTracker()->idToDet(pState.detId());
+    TrajectoryStateOnSurface outerState = trajectoryStateTransform::transientState(pState, &(gdet->surface()), magfieldH.product());
+
+    TrackingRecHit::RecHitPointer recHit(new TRecHit5DParamConstraint(*gdet, outerState));
+    TrajectoryStateOnSurface invalidState(gdet->surface());
+    auto hitLayer = measurementTrackerH->geometricSearchTracker()->detLayer(pState.detId());
+    tmp.emplace(invalidState, outerState, recHit, 0, hitLayer);
+
+    if(tmp.empty()){
+      std::cout << "SeedGeneratorFromTTracks:: tmp traj measurements empty" << std::endl;
+    }
+    else{
+      std::cout << "SeedGeneratorFromTTracks:: tmp traj measurements NOT empty" << std::endl;
+    }
   };
-  //TempTrajectory out(seed.direction(), seed.nHits());
-  //seedMeasurements(seed, result, theSeedAs5DHit);
+
 
   ev.put(std::move(result));
   std::cout << "SeedGeneratorFromTTracks::end " << std::endl;
