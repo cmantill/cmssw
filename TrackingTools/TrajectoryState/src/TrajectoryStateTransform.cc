@@ -78,18 +78,31 @@ namespace trajectoryStateTransform {
     double mMagneticFieldStrength = field->inTesla(GlobalPoint(0,0,0)).z();
     float trk_signedPt = speedOfLightConverted * mMagneticFieldStrength / tk.rInv(); // transverse curvature
     GlobalTrajectoryParameters par(gpos, gmom, trk_signedPt, dummy, field);
-    if (!withErr)
-      return FreeTrajectoryState(par);
-    CurvilinearTrajectoryError newError;  // zeroed                                                                                                                            
-    auto& C = newError.matrix();
-    auto sin2Theta = par.momentum().perp2() / par.momentum().mag2(); 
-    AlgebraicSymMatrix55 mat;                                                                                                                                                      
-    double maxC00 = 1.0;
-    C[0][0] = std::max(0.1*sin2Theta, maxC00);
-    C[1][1] = std::abs(0.1*atan(tk.tanL()));
-    C[2][2] = std::abs(0.1*tk.phi());
-    C[3][3] = std::abs(0.1*tk.d0());
-    C[4][4] = std::abs(0.1*tk.z0());
+    //if (!withErr)
+    //  return FreeTrajectoryState(par);
+    //CurvilinearTrajectoryError newError;  // zeroed                                                                                                                            
+    //auto& C = newError.matrix();
+    AlgebraicSymMatrix55 mat;
+
+    int dim = 5;
+    int k = 0;
+    for (int i = 0; i < dim; i++) {
+      for (int j = 0; j <= i; j++) {
+	mat(i, j) = 1.0E-8;
+      }
+    }
+
+    CurvilinearTrajectoryError newError(mat);
+
+    // auto sin2Theta = par.momentum().perp2() / par.momentum().mag2(); 
+    // AlgebraicSymMatrix55 mat;                                                                                                                                                  
+    // double maxC00 = 1.0;
+    // C[0][0] = std::max(0.1*sin2Theta, maxC00);
+    // C[1][1] = std::abs(0.1*atan(tk.tanL()));
+    // C[2][2] = std::abs(0.1*tk.phi());
+    // C[3][3] = std::abs(0.1*tk.d0());
+    // C[4][4] = std::abs(0.1*tk.z0());
+
     return FreeTrajectoryState(par, newError);
   }
 
