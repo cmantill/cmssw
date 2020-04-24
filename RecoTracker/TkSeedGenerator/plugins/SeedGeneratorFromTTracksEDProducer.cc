@@ -83,7 +83,8 @@ void SeedGeneratorFromTTracksEDProducer::findSeedsOnLayer(const GeometricSearchD
       //dets.front().second.rescaleError(errorSFHitless);
       PTrajectoryStateOnDet const& ptsod = trajectoryStateTransform::persistentState(tsosOnLayer, detOnLayer->geographicalId().rawId());
       TrajectorySeed::recHitContainer rHC;
-      out->push_back(TrajectorySeed(ptsod, rHC, alongMomentum));
+      out->push_back(TrajectorySeed(ptsod, rHC, oppositeToMomentum));
+      //out->push_back(TrajectorySeed(ptsod, rHC, alongMomentum));
       std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) push seed " << std::endl;
       numSeedsMade++;
     }
@@ -119,6 +120,9 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
   es.get<TrackingComponentsRecord>().get(thePropagatorName, propagatorAlongH);
   std::unique_ptr<Propagator> propagatorAlong = SetPropagationDirection(*propagatorAlongH, alongMomentum);
 
+  edm::ESHandle<Propagator> propagatorOppositeH;
+  es.get<TrackingComponentsRecord>().get(thePropagatorName, propagatorOppositeH);
+  std::unique_ptr<Propagator> propagatorOpposite = SetPropagationDirection(*propagatorOppositeH, oppositeToMomentum);
 
   // Get vector of Detector layers 
   edm::Handle<MeasurementTrackerEvent> measurementTrackerH;
@@ -146,10 +150,19 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
 	      << l1.momentum().phi() << std::endl;
 
     FreeTrajectoryState fts = trajectoryStateTransform::initialFreeStateTTrack(l1, magfieldH.product(), false);
+    std::cout << "SeedGeneratorFromTTracks::FreeTrajectoryState " << fts << std::endl;
+    if (fts.hasError()) {
+      std::cout << "fts has error " << std::endl;
+    }
     dummyPlane->move(fts.position() - dummyPlane->position());
     TrajectoryStateOnSurface tsosAtIP = TrajectoryStateOnSurface(fts, *dummyPlane);
     std::cout << "SeedGeneratorFromTTracks::produce: Created TSOSatIP: " << tsosAtIP << std::endl;
-
+    if (tsosAtIP.isValid()){
+      std::cout << "TSOSatIP is valid " << std::endl;
+    }
+    if (tsosAtIP.hasError()) {
+      std::cout << "TSOSatIP hass error " << std::endl;
+    }
     unsigned int numSeedsMade = 0;
     //BARREL
     if (std::abs(l1.momentum().eta()) < theMaxEtaForTOB) {
