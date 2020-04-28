@@ -57,7 +57,6 @@ SeedGeneratorFromTTracksEDProducer::SeedGeneratorFromTTracksEDProducer(const Par
       theMaxEtaForTOB(cfg.getParameter<double>("maxEtaForTOB")),
       theTrajectoryBuilder(createBaseCkfTrajectoryBuilder(cfg.getParameter<edm::ParameterSet>("TrajectoryBuilderPSet"), consumesCollector()))
 {
-  //produces<std::vector<TrajectorySeed> >();
   produces<TrajectorySeedCollection>();
 }
 
@@ -80,13 +79,15 @@ void SeedGeneratorFromTTracksEDProducer::findSeedsOnLayer(const GeometricSearchD
     if (!tsosOnLayer.isValid()) {
       std::cout << "ERROR!: Hitless TSOS is not valid! \n";
     } else {
-      //dets.front().second.rescaleError(errorSFHitless);
       PTrajectoryStateOnDet const& ptsod = trajectoryStateTransform::persistentState(tsosOnLayer, detOnLayer->geographicalId().rawId());
       TrajectorySeed::recHitContainer rHC;
-      out->push_back(TrajectorySeed(ptsod, rHC, oppositeToMomentum));
-      //out->push_back(TrajectorySeed(ptsod, rHC, alongMomentum));
-      std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) push seed " << std::endl;
-      numSeedsMade++;
+      if(numSeedsMade < 1){ // only outermost seed (?)
+	out->push_back(TrajectorySeed(ptsod, rHC, oppositeToMomentum));
+	//out->push_back(TrajectorySeed( PTrajectoryStateOnDet (localParam, pt, em, detId, 0), 
+	//edm::OwnVector< TrackingRecHit >() , PropagationDirection::alongMomentum));
+	std::cout << "SeedGeneratorFromTTracks::findSeedsOnLayer: TSOD (Hitless) push seed " << std::endl;
+	numSeedsMade++;
+      }
     }
   }
   //else{
@@ -146,8 +147,7 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
     const TTTrack< Ref_Phase2TrackerDigi_ >& l1 = (*it);
 
     std::unique_ptr<std::vector<TrajectorySeed> > out(new std::vector<TrajectorySeed>());
-    std::cout << "SeedGeneratorFromTTracks::produce: L1 track pT, eta, phi --> " << l1.momentum().mag() << " , " << l1.momentum().eta() << " , "
-	      << l1.momentum().phi() << std::endl;
+    std::cout << "SeedGeneratorFromTTracks::produce: L1 track pT, eta, phi --> " << l1.momentum().mag() << " , " << l1.momentum().eta() << " , " << l1.momentum().phi() << std::endl;
 
     FreeTrajectoryState fts = trajectoryStateTransform::initialFreeStateTTrack(l1, magfieldH.product(), false);
     std::cout << "SeedGeneratorFromTTracks::FreeTrajectoryState " << fts << std::endl;
@@ -176,6 +176,9 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
 			 numSeedsMade,			
                          out);
       }
+    }
+    if (std::abs(l1.momentum().eta()) > theMinEtaForTEC && std::abs(l1.momentum().eta()) < theMaxEtaForTOB) {
+      numSeedsMade = 0; // reset num of seeds
     }
     //ENDCAP+
     if (l1.momentum().eta() > theMinEtaForTEC) {
@@ -220,16 +223,7 @@ void SeedGeneratorFromTTracksEDProducer::produce(edm::Event& ev, const edm::Even
   theTrajectoryBuilder->setNavigationSchool(navigation);
 
   // get the trajectory builder and initialize it with the data
-  //edm::Handle<MeasurementTrackerEvent> data;
-  //ev.getByToken(theMeasurementTrackerTag, data);
-  //edm::Handle<PixelClusterMask> pixelMask;
-  //e.getByToken(maskPixels_, pixelMask);
-  //edm::Handle<Phase2OTClusterMask> phase2OTMask;
-  //e.getByToken(maskPhase2OTs_, phase2OTMask);
-  //dataWithMasks = std::make_unique<MeasurementTrackerEvent>(*data, *pixelMask, *phase2OTMask);
-  std::cout << "set event " << std::endl;
   theTrajectoryBuilder->setEvent(ev, es, &*measurementTrackerH);
-
 
   for (unsigned i = 0; i < result->size(); ++i) {
     std::cout << "SeedGeneratorFromTTracks:: startingState pt " << seeds[i].startingState().pt() << std::endl;
