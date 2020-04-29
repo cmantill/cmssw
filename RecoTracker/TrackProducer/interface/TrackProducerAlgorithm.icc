@@ -40,6 +40,7 @@ void TrackProducerAlgorithm<T>::runWithCandidate(const TrackingGeometry* theG,
                                                  const reco::BeamSpot& bs,
                                                  AlgoProductCollection& algoResults) {
   LogDebug("TrackProducer") << "Number of TrackCandidates: " << theTCCollection.size() << "\n";
+  std::cout << "TrackProducerWithCandidate " << "Number of TrackCandidates: " << theTCCollection.size() << "\n";
 
   int cont = 0;
   int ntc = 0;
@@ -55,7 +56,7 @@ void TrackProducerAlgorithm<T>::runWithCandidate(const TrackingGeometry* theG,
         trajectoryStateTransform::transientState(state, &(theG->idToDet(detId)->surface()), theMF);
 
     LogDebug("TrackProducer") << "Initial TSOS\n" << theTSOS << "\n";
-
+    std::cout << "TrackProducerWithCandidate " << "Initial TSOS\n" << theTSOS << std::endl;
     //convert the TrackingRecHit vector to a TransientTrackingRecHit vector
     TrackingRecHit::RecHitContainer hits;
 
@@ -63,16 +64,28 @@ void TrackProducerAlgorithm<T>::runWithCandidate(const TrackingGeometry* theG,
     //  we assume are transient...
     for (auto i = recHitVec.first; i != recHitVec.second; ++i) {
       hits.push_back((*i).cloneSH());  // major waste, will be soon fitted and recloned...
+      if ( (*i).isValid() )
+      {
+        GlobalPoint HitPosition = theG->idToDet((*i).geographicalId())->surface().toGlobal((*i).localPosition());
+
+        std::cout << "TrackProducerWithCandidate HitPosition (x, y, z, R, phi) = " << HitPosition.x() << " " << HitPosition.y() << " " << HitPosition.z() << " " 
+          << HitPosition.perp() << " " << HitPosition.phi() << std::endl;
+      }
+      else{
+        std::cout << "TrackProducerWithCandidate Hit not valid " << std::endl;
+      }
     }
 
     stopReason_ = theTC.stopReason();
     //build Track
     LogDebug("TrackProducer") << "going to buildTrack"
                               << "\n";
+    std::cout << "TrackProducerWithCandidate" << " going to buildTrack" << std::endl;
     FitterCloner fc(theFitter, builder);
     bool ok = buildTrack(
         fc.fitter.get(), thePropagator, algoResults, hits, theTSOS, seed, ndof, bs, theTC.seedRef(), 0, theTC.nLoops());
     LogDebug("TrackProducer") << "buildTrack result: " << ok << "\n";
+    std::cout << "TrackProducerWithCandidate " << "buildTrack result: " << ok << std::endl;
     if (ok) {
       algoResults.back().indexInput = ntc;
       ++cont;
@@ -80,7 +93,7 @@ void TrackProducerAlgorithm<T>::runWithCandidate(const TrackingGeometry* theG,
     ++ntc;
   }
   LogDebug("TrackProducer") << "Number of Tracks found: " << cont << "\n";
-  // std::cout << "VICkfProducer " << "Number of Tracks found: " << cont << std::endl;
+  std::cout << "VICkfProducer " << "Number of Tracks found: " << cont << std::endl;
 }
 
 // the following are called by the Refitter(s)

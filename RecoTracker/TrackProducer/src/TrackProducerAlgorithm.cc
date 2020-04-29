@@ -106,6 +106,7 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
   if
     UNLIKELY(!trajTmp.isValid()) {
       DPRINT("TrackFitters") << "fit failed " << algo_ << ": " << hits.size() << '|' << int(nLoops) << ' ' << std::endl;
+      std::cout << "fit failed " << algo_ << ": " << hits.size() << '|' << int(nLoops) << ' ' << std::endl;
       return false;
     }
 
@@ -191,6 +192,7 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
 
   if
     UNLIKELY(!stateForProjectionToBeamLineOnSurface.isValid()) {
+      std::cout << "the state on the closest measurement isnot valid. skipping track." << std::endl;
       edm::LogError("CannotPropagateToBeamLine") << "the state on the closest measurement isnot valid. skipping track.";
       delete theTraj;
       return false;
@@ -198,13 +200,13 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
   const FreeTrajectoryState& stateForProjectionToBeamLine = *stateForProjectionToBeamLineOnSurface.freeState();
 
   LogDebug("TrackProducer") << "stateForProjectionToBeamLine=" << stateForProjectionToBeamLine;
-
+  std::cout << "stateForProjectionToBeamLine=" << stateForProjectionToBeamLine << std::endl;
   //  TSCBLBuilderNoMaterial tscblBuilder;
   //  TrajectoryStateClosestToBeamLine tscbl = tscblBuilder(stateForProjectionToBeamLine,bs);
 
   TrajectoryStateClosestToBeamLine tscbl;
   if (usePropagatorForPCA_) {
-    //std::cout << "PROPAGATOR FOR PCA" << std::endl;
+    std::cout << "PROPAGATOR FOR PCA" << std::endl;
     TSCBLBuilderWithPropagator tscblBuilder(*thePropagator);
     tscbl = tscblBuilder(stateForProjectionToBeamLine, bs);
   } else {
@@ -214,6 +216,7 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
 
   if
     UNLIKELY(!tscbl.isValid()) {
+      std::cout << "not valid tscbl " << std::endl;
       delete theTraj;
       return false;
     }
@@ -224,7 +227,7 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
   math::XYZVector mom(p.x(), p.y(), p.z());
 
   LogDebug("TrackProducer") << "pos=" << v << " mom=" << p << " pt=" << p.perp() << " mag=" << p.mag();
-
+  std::cout << "TrackProducer" << "pos=" << v << " mom=" << p << " pt=" << p.perp() << " mag=" << p.mag() << std::endl;
   auto theTrack = new reco::Track(theTraj->chiSquared(),
                                   int(ndof),  //FIXME fix weight() in TrackingRecHit
                                   pos,
@@ -241,6 +244,7 @@ bool TrackProducerAlgorithm<reco::Track>::buildTrack(const TrajectoryFitter* the
   theTrack->setNLoops(nLoops);
   theTrack->setStopReason(stopReason_);
 
+  std::cout << "theTrack->pt()=" << theTrack->pt() << std::endl;
   LogDebug("TrackProducer") << "theTrack->pt()=" << theTrack->pt();
 
   LogDebug("TrackProducer") << "track done\n";
@@ -270,8 +274,10 @@ bool TrackProducerAlgorithm<reco::GsfTrack>::buildTrack(const TrajectoryFitter* 
   Trajectory&& trajTmp =
       theFitter->fitOne(seed, hits, theTSOS, (nLoops > 0) ? TrajectoryFitter::looper : TrajectoryFitter::standard);
   if
-    UNLIKELY(!trajTmp.isValid()) return false;
-
+    UNLIKELY(!trajTmp.isValid()) {
+      std::cout << "trak tmp not valid " <<std::endl;
+      return false;
+    }
   auto theTraj = new Trajectory(std::move(trajTmp));
   theTraj->setSeedRef(seedRef);
 
@@ -305,6 +311,8 @@ bool TrackProducerAlgorithm<reco::GsfTrack>::buildTrack(const TrajectoryFitter* 
   dc(outertsos);
   LogDebug("TrackProducer") << "Nr. of first / last states = " << innertsos.components().size() << " "
                             << outertsos.components().size() << ss.str();
+  std::cout << "Nr. of first / last states = " << innertsos.components().size() << " "
+	    << outertsos.components().size() << ss.str() << std:endl;
 #endif
 
   ndof = 0;
@@ -337,12 +345,14 @@ bool TrackProducerAlgorithm<reco::GsfTrack>::buildTrack(const TrajectoryFitter* 
     UNLIKELY(!stateForProjectionToBeamLineOnSurface.isValid()) {
       edm::LogError("CannotPropagateToBeamLine") << "the state on the closest measurement isnot valid. skipping track.";
       delete theTraj;
+      std::cout << "CannotPropagateToBeamLine " << "the state on the closest measurement isnot valid. skipping track." << std::endl;
       return false;
     }
 
   const FreeTrajectoryState& stateForProjectionToBeamLine = *stateForProjectionToBeamLineOnSurface.freeState();
 
   LogDebug("GsfTrackProducer") << "stateForProjectionToBeamLine=" << stateForProjectionToBeamLine;
+  std::cout << "GsfTrackProducer " << "stateForProjectionToBeamLine=" << stateForProjectionToBeamLine << std::endl;
 
   //  TSCBLBuilderNoMaterial tscblBuilder;
   //  TrajectoryStateClosestToBeamLine tscbl = tscblBuilder(stateForProjectionToBeamLine,bs);
@@ -359,6 +369,7 @@ bool TrackProducerAlgorithm<reco::GsfTrack>::buildTrack(const TrajectoryFitter* 
   if
     UNLIKELY(tscbl.isValid() == false) {
       delete theTraj;
+      std::cout << "GsfTrackProducer " << "tscbl is not valid" << std::endl;
       return false;
     }
 
