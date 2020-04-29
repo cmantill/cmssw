@@ -30,6 +30,9 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
+#include "RecoTracker/CkfPattern/interface/BaseCkfTrajectoryBuilderFactory.h"
+#include "RecoTracker/CkfPattern/interface/BaseCkfTrajectoryBuilder.h"
+
 #include "RecoTracker/MeasurementDet/interface/MeasurementTrackerEvent.h"
 #include "TrackingTools/GeomPropagators/interface/Propagator.h"
 #include "TrackingTools/KalmanUpdators/interface/Chi2MeasurementEstimator.h"
@@ -51,7 +54,6 @@ public:
   SeedGeneratorFromTTracksEDProducer(const edm::ParameterSet& cfg);
   ~SeedGeneratorFromTTracksEDProducer() override {}
   void produce(edm::Event& ev, const edm::EventSetup& es) override;
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
   void findSeedsOnLayer(const GeometricSearchDet& layer,
 			const TrajectoryStateOnSurface& tsosAtIP,
 			const Propagator& propagatorAlong,
@@ -73,6 +75,7 @@ private:
   /// Maximum eta value to activate searching in the TOB
   const double theMaxEtaForTOB;
 
+  std::unique_ptr<BaseCkfTrajectoryBuilder> theTrajectoryBuilder;
 
 };
 #endif

@@ -21,6 +21,8 @@
 <use   name="TrackingTools/Records"/>
 <use   name="CommonTools/Utils"/>
 <use   name="RecoTracker/TkHitPairs"/>
+<use   name="RecoTracker/CkfPattern"/>   
+<use   name="RecoTracker/TransientTrackingRecHit"/>
 <export>
   <lib   name="1"/>
 </export>
