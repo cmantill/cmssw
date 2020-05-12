@@ -72,27 +72,15 @@ namespace trajectoryStateTransform {
   FreeTrajectoryState initialFreeStateTTrack(const TTTrack< Ref_Phase2TrackerDigi_ >& tk, const MagneticField* field, bool withErr) {
     Basic3DVector<float> pos(tk.POCA());
     GlobalPoint gpos(pos);
-    Basic3DVector<float> mom(tk.momentum().x()*100.0,tk.momentum().y()*100.0,tk.momentum().z()*100.0);
-    GlobalVector gmom(mom);
-    // no track charge so used track transverse curvature curvature
-    int dummy=0;
-    float speedOfLightConverted = CLHEP::c_light/1.0E5; // B*c/2E11 - converts q/pt to track angle at some radius from beamline
+    GlobalVector gmom = tk.momentum();
 
+    float speedOfLightConverted = CLHEP::c_light/1.0E5; // -2.99792458e-3f
     double mMagneticFieldStrength = field->inTesla(tk.POCA()).z();
-    float trk_signedPt = speedOfLightConverted * mMagneticFieldStrength / tk.rInv() * 100.0;
-    GlobalTrajectoryParameters par(gpos, gmom, trk_signedPt/fabs(trk_signedPt), field);
-    //if (!withErr)
-    //  return FreeTrajectoryState(par);
-    //CurvilinearTrajectoryError newError;  // zeroed
-    //auto& C = newError.matrix();
+    float trk_signedPt = speedOfLightConverted * mMagneticFieldStrength / tk.rInv(); 
+    int charge = (trk_signedPt/fabs(trk_signedPt)) > 0.f ? 1 : -1;
+
+    GlobalTrajectoryParameters par(gpos, gmom, charge, field);
     AlgebraicSymMatrix55 mat; mat = mat + 1e-8;
-
-    // std::cout << "L1 TRACK! " << std::endl;
-    // std::cout << "speed of light " << speedOfLightConverted << std::endl;
-    // std::cout << "trk_signedPt : " << trk_signedPt << std::endl;
-    // std::cout << "trk_signedPt mom: " << gmom.transverse() << std::endl;
-    // std::cout << "Q: " << trk_signedPt/gmom.transverse() << std::endl;
-
     CurvilinearTrajectoryError newError(mat);
 
     return FreeTrajectoryState(par, newError);
