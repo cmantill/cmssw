@@ -673,7 +673,7 @@ void L1TrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //TTTrack<Ref_Phase2TrackerDigi_> aTrack;
 
     // this is where we create the TTTrack object
-    double tmp_rinv = track.rinv() * 100.; //by default this variable is in [cm-1], so convert to [m-1]
+    double tmp_rinv = track.rinv(); // * 100.; //by default this variable is in [cm-1], so convert to [m-1]
     double tmp_phi = track.phi0();
     double tmp_eta = track.eta();
     double tmp_z0 = track.z0();
