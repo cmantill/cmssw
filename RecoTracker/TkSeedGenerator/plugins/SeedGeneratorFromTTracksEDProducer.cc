@@ -79,7 +79,7 @@ void SeedGeneratorFromTTracksEDProducer::findSeedsOnLayer(const GeometricSearchD
       dets.front().second.rescaleError(errorSFHitless);
       
       PTrajectoryStateOnDet const& ptsod = trajectoryStateTransform::persistentState(tsosOnLayer, detOnLayer->geographicalId().rawId());
-      TrajectorySeed::recHitContainer rHC;
+      TrajectorySeed::RecHitContainer rHC;
       if(numSeedsMade < 1){ // only outermost seed (?)
 	out->push_back(TrajectorySeed(ptsod, rHC, oppositeToMomentum));
 	numSeedsMade++;
