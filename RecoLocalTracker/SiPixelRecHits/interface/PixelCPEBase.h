@@ -17,6 +17,7 @@
 
 #include "RecoLocalTracker/ClusterParameterEstimator/interface/PixelClusterParameterEstimator.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitQuality.h"
+#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
@@ -146,6 +147,9 @@ public:
     //std::cout<<" in PixelCPEBase:localParameters(all) - "<<nRecHitsTotal_<<std::endl;  //dk
 #endif
 
+    double xtfrac=0.1; // default should be 0.                                                                                                                                    
+    unfoldCrossTalk(xtfrac, cl);
+
     DetParam const& theDetParam = detParam(det);
     std::unique_ptr<ClusterParam> theClusterParam = createClusterParam(cl);
     setTheClu(theDetParam, *theClusterParam);
@@ -256,7 +260,8 @@ protected:
   //---------------------------------------------------------------------------
 protected:
   void computeAnglesFromDetPosition(DetParam const& theDetParam, ClusterParam& theClusterParam) const;
-
+  //void unfoldCrossTalk(double& xtfrac, ClusterParam& theClusterParam) const;
+  void unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const;
   void computeAnglesFromTrajectory(DetParam const& theDetParam,
                                    ClusterParam& theClusterParam,
                                    const LocalTrajectoryParameters& ltp) const;

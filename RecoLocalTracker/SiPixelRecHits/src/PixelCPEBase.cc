@@ -23,6 +23,12 @@
 
 using namespace std;
 
+namespace {
+  constexpr float micronsToCm = 1.0e-4;
+  constexpr int cluster_matrix_size_x = 13;
+  constexpr int cluster_matrix_size_y = 21;
+}  // namespace
+
 //-----------------------------------------------------------------------------
 //  A constructor run for generic and templates
 //
@@ -246,6 +252,83 @@ void PixelCPEBase::setTheClu(DetParam const& theDetParam, ClusterParam& theClust
 
   theClusterParam.spansTwoROCs_ = theDetParam.theRecTopol->containsBigPixelInX(minInX, maxInX) |
                                   theDetParam.theRecTopol->containsBigPixelInY(minInY, maxInY);
+}
+
+//-----------------------------------------------------------------------------
+// Unfold cross talk in cluster
+//-----------------------------------------------------------------------------
+//void PixelCPEBase::unfoldCrossTalk(double& xtfrac, ClusterParam& theClusterParam) const {
+void PixelCPEBase::unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const {
+  // When xtalk applied:
+  // matrix looks like | 1-x  x | 
+  //                  | x  1-x |
+  // Unfold cross talk. Remember cluster is flipped compared to before, 
+  // inverse matrix is (1/(2-x)) * |1 - x  -x |
+  //                               | -x  1 -x |
+  if(xtfrac == 0.) return;
+  float m11 = 1.-xtfrac;
+  float minv11 = m11/(1. - 2.*xtfrac);
+  float minv22 = minv11;
+  float minv12 = -xtfrac/(1. - 2.*xtfrac);
+  float minv21 = minv12;       
+
+  // first compute matrix size
+  int row_offset = cl.minPixelRow();
+  int col_offset = cl.minPixelCol();
+  int mrow = 0, mcol = 0;
+  for (int i = 0; i != cl.size(); ++i) {
+    auto pix = cl.pixel(i);
+    mrow = std::max(mrow, int(pix.x));
+    mcol = std::max(mcol, int(pix.y));
+  }
+  mrow -= row_offset;
+  mrow += 1;
+  mrow = std::min(mrow, cluster_matrix_size_x);
+  mcol -= col_offset;
+  mcol += 1;
+  mcol = std::min(mcol, cluster_matrix_size_y);
+  assert(mrow > 0);
+  assert(mcol > 0);
+
+  // then build clustMatrix
+  float clustMatrix[mrow][mcol];
+  memset(clustMatrix, 0, sizeof(float) * mrow * mcol);  // Wipe it clean.
+  for (int i = 0; i != cl.size(); ++i) {
+    auto pix = cl.pixel(i);
+    int irow = int(pix.x) - row_offset;
+    int icol = int(pix.y) - col_offset;
+    // &&& Do we ever get pixels that are out of bounds ???  Need to check.
+    if ((irow < mrow) & (icol < mcol)) 
+      clustMatrix[irow][icol] = float(pix.adc);
+  }
+
+  // now unfold xtalk
+  float tmpclustMatrix[mrow][mcol];
+  float xtalk_row_start = 0; // this is 1 sometimes?
+  for(int i=xtalk_row_start; i<mrow-1; i += 2) { // xtalk applied to pairs of rows
+    for(int j=0; j<mcol; j++) {
+      float old_ij = clustMatrix[i][j];
+      float old_i1j = clustMatrix[i+1][j];
+      tmpclustMatrix[i][j] = old_ij*minv11 + old_i1j*minv12;
+      tmpclustMatrix[i+1][j] = old_ij*minv11 + old_i1j*minv12;
+    }
+  }
+
+  // now pass to the clusterParam
+  for (int i = 0; i != cl.size(); ++i) {
+    auto pix = cl.pixel(i);
+    int irow = int(pix.x) - row_offset;
+    int icol = int(pix.y) - col_offset;
+    if ((irow < mrow) & (icol < mcol)){
+      // not sure how to modify the cluster
+      // is it with pixel?
+      //theClusterParam.theCluster->pixel(i).adc = tmpclustMatrix[irow][icol];
+      // or pixeladc?
+      //theClusterParam.theCluster->thePixelADC[i] = tmpclustMatrix[irow][icol];  
+      cl.pixel(i) = SiPixelCluster::Pixel(cl.minPixelRow() + cl.pixelOffset()[i * 2], cl.minPixelCol() + cl.pixelOffset()[i * 2 + 1], tmpclustMatrix[irow][icol]);
+    }
+  }
+    
 }
 
 //-----------------------------------------------------------------------------
