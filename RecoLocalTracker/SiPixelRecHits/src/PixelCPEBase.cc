@@ -10,7 +10,6 @@
 #include "Geometry/CommonTopologies/interface/ProxyPixelTopology.h"
 
 #include "RecoLocalTracker/SiPixelRecHits/interface/PixelCPEBase.h"
-
 #define CORRECT_FOR_BIG_PIXELS
 
 // MessageLogger
@@ -257,15 +256,14 @@ void PixelCPEBase::setTheClu(DetParam const& theDetParam, ClusterParam& theClust
 //-----------------------------------------------------------------------------
 // Unfold cross talk in cluster
 //-----------------------------------------------------------------------------
-//void PixelCPEBase::unfoldCrossTalk(double& xtfrac, ClusterParam& theClusterParam) const {
-void PixelCPEBase::unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const {
+SiPixelCluster PixelCPEBase::unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const {
   // When xtalk applied:
   // matrix looks like | 1-x  x | 
   //                  | x  1-x |
   // Unfold cross talk. Remember cluster is flipped compared to before, 
   // inverse matrix is (1/(2-x)) * |1 - x  -x |
   //                               | -x  1 -x |
-  if(xtfrac == 0.) return;
+  if(xtfrac == 0.) return cl;
   float m11 = 1.-xtfrac;
   float minv11 = m11/(1. - 2.*xtfrac);
   float minv22 = minv11;
@@ -314,21 +312,22 @@ void PixelCPEBase::unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) con
     }
   }
 
-  // now pass to the clusterParam
+  // now build a new cluster  
+  PixelClusterizerBase::AccretionCluster acluster;
   for (int i = 0; i != cl.size(); ++i) {
     auto pix = cl.pixel(i);
     int irow = int(pix.x) - row_offset;
     int icol = int(pix.y) - col_offset;
     if ((irow < mrow) & (icol < mcol)){
-      // not sure how to modify the cluster
-      // is it with pixel?
-      //theClusterParam.theCluster->pixel(i).adc = tmpclustMatrix[irow][icol];
-      // or pixeladc?
-      //theClusterParam.theCluster->thePixelADC[i] = tmpclustMatrix[irow][icol];  
-      cl.pixel(i) = SiPixelCluster::Pixel(cl.minPixelRow() + cl.pixelOffset()[i * 2], cl.minPixelCol() + cl.pixelOffset()[i * 2 + 1], tmpclustMatrix[irow][icol]);
+      int temp_x = pix.x;
+      int temp_y = pix.y;
+      int temp_adc = tmpclustMatrix[irow][icol];
+      SiPixelCluster::PixelPos newpix(temp_x, temp_y);
+      acluster.add(newpix, temp_adc);
     }
   }
-    
+  SiPixelCluster cluster(acluster.isize, acluster.adc, acluster.x, acluster.y, acluster.xmin, acluster.ymin);
+  return cluster;
 }
 
 //-----------------------------------------------------------------------------

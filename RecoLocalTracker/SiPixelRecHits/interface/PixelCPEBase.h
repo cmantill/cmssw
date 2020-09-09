@@ -16,6 +16,7 @@
 #include "TMath.h"
 
 #include "RecoLocalTracker/ClusterParameterEstimator/interface/PixelClusterParameterEstimator.h"
+#include "RecoLocalTracker/SiPixelClusterizer/plugins/PixelClusterizerBase.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitQuality.h"
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 
@@ -147,8 +148,9 @@ public:
     //std::cout<<" in PixelCPEBase:localParameters(all) - "<<nRecHitsTotal_<<std::endl;  //dk
 #endif
 
-    double xtfrac=0.1; // default should be 0.                                                                                                                                    
-    unfoldCrossTalk(xtfrac, cl);
+    //double xtfrac=0.1; // default should be 0.                                                                                                                                    
+    double xtfrac=0.;
+    const SiPixelCluster& cluster = unfoldCrossTalk(xtfrac, cl);
 
     DetParam const& theDetParam = detParam(det);
     std::unique_ptr<ClusterParam> theClusterParam = createClusterParam(cl);
@@ -176,8 +178,12 @@ public:
     //std::cout<<" in PixelCPEBase:localParameters(on track) - "<<nRecHitsTotal_<<std::endl;  //dk
 #endif
 
+    //double xtfrac=0.1; // default should be 0.                                                                                                                                   
+    double xtfrac=0.;
+    const SiPixelCluster& cluster = unfoldCrossTalk(xtfrac, cl);
+
     DetParam const& theDetParam = detParam(det);
-    std::unique_ptr<ClusterParam> theClusterParam = createClusterParam(cl);
+    std::unique_ptr<ClusterParam> theClusterParam = createClusterParam(cluster);
     setTheClu(theDetParam, *theClusterParam);
     computeAnglesFromTrajectory(theDetParam, *theClusterParam, ltp);
 
@@ -260,8 +266,7 @@ protected:
   //---------------------------------------------------------------------------
 protected:
   void computeAnglesFromDetPosition(DetParam const& theDetParam, ClusterParam& theClusterParam) const;
-  //void unfoldCrossTalk(double& xtfrac, ClusterParam& theClusterParam) const;
-  void unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const;
+  SiPixelCluster unfoldCrossTalk(double& xtfrac, const SiPixelCluster& cl) const;
   void computeAnglesFromTrajectory(DetParam const& theDetParam,
                                    ClusterParam& theClusterParam,
                                    const LocalTrajectoryParameters& ltp) const;
