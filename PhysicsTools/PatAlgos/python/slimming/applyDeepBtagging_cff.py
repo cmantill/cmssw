@@ -87,11 +87,11 @@ def applyDeepBtagging(process, postfix=""):
     # delete module not used anymore (slimmedJetsPuppi substitutes)
     delattr(process, 'selectedUpdatedPatJetsSlimmedPuppiWithDeepTags' + postfix)
 
-
     from RecoBTag.ONNXRuntime.pfDeepBoostedJet_cff import _pfDeepBoostedJetTagsAll as pfDeepBoostedJetTagsAll
     from RecoBTag.ONNXRuntime.pfHiggsInteractionNet_cff import _pfHiggsInteractionNetTagsProbs as pfHiggsInteractionNetTagsProbs
+    from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetJetTagsAll as pfParticleNetJetTagsAll
+    from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetMassRegressionOutputs as pfParticleNetMassRegressionOutputs
     from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetMassCorrelatedJetTagsAll as pfParticleNetMassCorrelatedJetTagsAll
-    from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetMassRegressionOutputs
     from RecoBTag.ONNXRuntime.pfParticleNetFromMiniAODAK8_cff import _pfParticleNetFromMiniAODAK8JetTagsAll as pfParticleNetFromMiniAODAK8JetTagsAll
 
     # update slimmed jets to include particle-based deep taggers (keep same name)
@@ -117,7 +117,8 @@ def applyDeepBtagging(process, postfix=""):
         #'pfParticleNetJetTags:probWcq',       
         #'pfParticleNetJetTags:probWqq',       
         #'pfParticleNetJetTags:probHqqqq',       
-    )   +  pfParticleNetMassCorrelatedJetTagsAll + pfHiggsInteractionNetTagsProbs + pfParticleNetFromMiniAODAK8JetTagsAll)
+    )   +  pfParticleNetMassCorrelatedJetTagsAll + pfHiggsInteractionNetTagsProbs + pfParticleNetFromMiniAODAK8JetTagsAll+ pfParticleNetJetTagsAll+pfParticleNetMassRegressionOutputs)
+
     updateJetCollection(
         process,
         jetSource = cms.InputTag('slimmedJetsAK8NoDeepTags'),
