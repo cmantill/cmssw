@@ -10,7 +10,7 @@ pfParticleTransformerAK8TagInfos = _pfParticleTransformerAK8TagInfos.clone(
 pfParticleTransformerAK8MDJetTags = boostedJetONNXJetTagsProducer.clone(
     src = 'pfParticleTransformerAK8TagInfos',
     preprocess_json = 'RecoBTag/ONNXRuntime/data/ParticleTransformerAK8/GlobalMD/V02/preprocess_corr.json',
-    model_path = 'RecoBTag/ONNXRuntime/data/ParticleTransformerAK8/GlobalMD/V02/model_opset14.onnx',
+    model_path = 'RecoBTag/ONNXRuntime/data/ParticleTransformerAK8/GlobalMD/V02/model.onnx',
     flav_names = [
         'probTopbWcs', 'probTopbWqq', 'probTopbWc', 'probTopbWs', 'probTopbWq', 'probTopbWev', 'probTopbWmv', 'probTopbWtauev', 'probTopbWtaumv', 'probTopbWtauhv', 
         'probTopWcs', 'probTopWqq', 'probTopWev', 'probTopWmv', 'probTopWtauev', 'probTopWtaumv', 'probTopWtauhv', 
