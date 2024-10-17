@@ -22,7 +22,7 @@ class Py8CSVReaderGun : public Py8GunBase {
       double  fMinProdRadius;
       double  fMaxProdRadius;
       bool    fMakeDisplaced;
-      int     fNumParticlesPerEvent;
+      int     fNumParticlesPerEvent; // number of particles saved in each event
       std::string fFilename;
       std::vector<float> all_ee, all_px, all_py, all_pz;
       std::vector<int> used_events;
@@ -54,7 +54,7 @@ Py8CSVReaderGun::Py8CSVReaderGun( edm::ParameterSet const& ps )
       all_pz.push_back(pz);
    }
    infile.close();
-   std::cout << "[Py8CSVReaderGun constructor] Finished reading CSV input file!" << std::endl;
+   std::cout << "[Py8CSVReaderGun constructor] Finished reading CSV input file! Size:" << all_ee.size() << std::endl;
 }
 bool Py8CSVReaderGun::generatePartonsAndHadronize()
 {
@@ -65,6 +65,7 @@ bool Py8CSVReaderGun::generatePartonsAndHadronize()
    double vx = radius * cos(phi_prod);
    double vy = radius * sin(phi_prod);
    double vz = (70 - (-70)) * randomEngine().flat() + (-70); // luminous region in Z: (-70, 70) mm
+   
    // ensure event is unique within single node (accept repetition after 100 times though)
    // note: this of course does not apply for batch production, where probability of repetition exists
    // (this is minimized by randomly sampling pluto list of events -- birthday problem)
@@ -75,7 +76,7 @@ bool Py8CSVReaderGun::generatePartonsAndHadronize()
    }
    while (std::find(used_events.begin(), used_events.end(), randomNumber) != used_events.end() && count < 100);
    used_events.push_back(randomNumber);
-   std::cout << "Retrieving CSV random event number " << randomNumber/fNumParticlesPerEvent << "..." << std::endl;
+   std::cout << "Retrieving CSV random event number " << randomNumber << " divided " << randomNumber/fNumParticlesPerEvent << "..." << std::endl;
    // Get the gamma (2nd in CSV) and electrons (4th and 5th in CSV) momenta
    float ee, px, py, pz, mass, pID; 
    // gamma
