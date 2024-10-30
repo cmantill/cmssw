@@ -71,7 +71,7 @@ bool Py8CSVReaderGun::generatePartonsAndHadronize()
    // (this is minimized by randomly sampling pluto list of events -- birthday problem)
    int randomNumber, count = 0;
    do {
-      randomNumber = (int)(30000 * randomEngine().flat()) * fNumParticlesPerEvent;
+      randomNumber = (int)(50000 * randomEngine().flat()) * fNumParticlesPerEvent;
       count++;
    }
    while (std::find(used_events.begin(), used_events.end(), randomNumber) != used_events.end() && count < 100);
